@@ -1,1 +1,25 @@
-
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>冠智幫您 - 健檢評估</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="overlay">
+    <h1>冠智幫您 - 健檢評估問卷</h1>
+    <label for="job">請選擇您的職業類別：</label>
+    <select id="job" onchange="loadQuestions()">
+      <option disabled selected>請選擇</option>
+      <option>一般上班族</option>
+      <option>自營業者</option>
+      <option>領導主管</option>
+      <option>計程車司機</option>
+      <option>公職/醫療</option>
+    </select>
+    <form id="questionForm"></form>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
