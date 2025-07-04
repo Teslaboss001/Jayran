@@ -1,1 +1,29 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: url('user_background.jpg') no-repeat center center fixed;
+  background-size: cover;
+  font-family: 'Helvetica', sans-serif;
+}
 
+.overlay {
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 30px;
+  max-width: 600px;
+  margin: 100px auto;
+  border-radius: 10px;
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+label, select {
+  font-size: 18px;
+  margin-top: 10px;
+}
+
+form {
+  margin-top: 20px;
+}
