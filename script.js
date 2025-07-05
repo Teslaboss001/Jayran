@@ -1,3 +1,4 @@
+// === 問題資料庫（SPIN） ===
 const spinQuestions = {
   "一般上班族": [
     "您目前有固定的勞保／勞退嗎？",
@@ -36,6 +37,7 @@ const spinQuestions = {
   ]
 };
 
+// === 基本資料下一步 ===
 document.getElementById("nextBtn").addEventListener("click", () => {
   const age = document.getElementById("age").value;
   const income = document.getElementById("income").value;
@@ -51,6 +53,7 @@ document.getElementById("nextBtn").addEventListener("click", () => {
   document.getElementById("questionSection").style.display = "block";
 });
 
+// === 問卷載入 ===
 function loadQuestions() {
   const job = document.getElementById("job").value;
   const form = document.getElementById("questionForm");
@@ -77,8 +80,54 @@ function loadQuestions() {
 
   submitBtn.addEventListener("click", function (e) {
     e.preventDefault();
-    alert("感謝填寫，我們將引導您前往 LINE。可將資料發送給我們進一步服務！");
-    window.location.href = "https://line.me/ti/p/%40dvjch";
+
+    // 讀取使用者資料
+    const age = document.getElementById("age").value;
+    const income = document.getElementById("income").value;
+    const saving = document.getElementById("saving").value;
+    const job = document.getElementById("job").value;
+    const answers = [...form.querySelectorAll("input[name^='q']")].map(i => i.value);
+
+    // 清空表單顯示區
+    form.innerHTML = "";
+
+    // 結果容器
+    const resultBox = document.createElement("div");
+    resultBox.className = "result-container";
+
+    const header = document.createElement("h2");
+    header.textContent = "📝 您的健檢問卷結果如下";
+    resultBox.appendChild(header);
+
+    // 基本資料顯示
+    const userInfo = document.createElement("p");
+    userInfo.innerHTML = `
+      年齡：${age} 歲<br>
+      平均月收入：${income} 元<br>
+      是否有儲蓄習慣：${saving}<br>
+      職業類別：${job}
+    `;
+    resultBox.appendChild(userInfo);
+
+    // 顯示每一題問與答
+    spinQuestions[job].forEach((q, i) => {
+      const card = document.createElement("div");
+      card.className = "qa-card";
+
+      const qEl = document.createElement("div");
+      qEl.className = "question";
+      qEl.innerHTML = `Q${i + 1}. ${q}`;
+
+      const aEl = document.createElement("div");
+      aEl.className = "answer";
+      aEl.innerHTML = `👉 ${answers[i]}`;
+
+      card.appendChild(qEl);
+      card.appendChild(aEl);
+      resultBox.appendChild(card);
+    });
+
+    form.appendChild(resultBox);
   });
 
   form.appendChild(submitBtn);
