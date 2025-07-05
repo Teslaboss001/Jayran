@@ -57,11 +57,7 @@ function loadQuestions() {
   });
 
   const submitBtn = document.createElement("button");
-  submitBtn.innerText = "送出問卷";
-  submitBtn.onclick = function () {
-    alert("感謝填寫！系統將引導您聯絡我們。");
-    window.location.href = "https://line.me/ti/p/@dvjch";
-  };
+  submitBtn.textContent = "開始評估";
   submitBtn.type = "button";
   submitBtn.style.marginTop = "20px";
 
