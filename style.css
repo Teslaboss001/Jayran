@@ -46,3 +46,7 @@ form {
   width: 100%;
   max-width: 500px;
 }
+.job-select-wrapper {
+  margin-top: 120px; /* 調整這個數值就能微調位置 */
+  text-align: center;
+}
