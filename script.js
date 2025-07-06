@@ -124,91 +124,94 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* === 5. 顯示結果（含提示、下載、LINE 按鈕） === */
 async function showResult(qs) {
-  const ans  = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
+  const ans = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
   const miss = ans.findIndex(a => !a);
   if (miss !== -1) return alert(`請回答第 ${miss + 1} 題！`);
 
   const info = {
-    name : $('name').value,
-    phone: $('phone').value,
-    line : $('lineId').value,
-    bday : $('birthday').value,
-    job  : jobSel.value
+    name: $("name").value,
+    phone: $("phone").value,
+    line: $("lineId").value,
+    bday: $("birthday").value,
+    job: jobSel.value
   };
 
-  form.innerHTML = '';
-  const box = document.createElement('div');
-  box.className = 'result-container';
+  form.innerHTML = "";
+  const box = document.createElement("div");
+  box.className = "result-container";
 
-  // 提示文字
-  const notice = document.createElement('p');
-  notice.innerHTML = '請先下載健檢資料，再前往 LINE 諮詢';
+  // 🔶 提示文字
+  const notice = document.createElement("p");
+  notice.innerHTML = "請先下載健檢資料，再前往 LINE 諮詢";
   notice.style.cssText = `
     background:#fffae6;border:1px solid #f2c94c;padding:10px;
-    text-align:center;font-weight:600;margin-bottom:10px;
+    text-align:center;font-weight:600;margin-bottom:15px;
   `;
   box.appendChild(notice);
 
-  // 按鈕群組容器
-  const btnWrap = document.createElement('div');
-  btnWrap.style.cssText = `
-    text-align:center;margin-bottom:20px;
-  `;
+  // 🔶 建立圖片下載按鈕 & Line 按鈕（預留）
+  const btnWrap = document.createElement("div");
+  btnWrap.style.cssText = "text-align:center; margin-bottom:20px;";
 
-  const dlBtn = document.createElement('button');
-  dlBtn.type = 'button';
-  dlBtn.textContent = '下載健檢成果';
+  const dlBtn = document.createElement("button");
+  dlBtn.textContent = "下載健檢成果";
+  dlBtn.type = "button";
   dlBtn.style.cssText = `
-    padding:8px 16px;font-size:14px;border-radius:6px;
-    border:1px solid #ccc;background:#fff;cursor:pointer;
+    padding:8px 14px;font-size:14px;
+    background:#fff;border:1px solid #888;
+    border-radius:5px;margin-right:10px;cursor:pointer;
   `;
 
-  const lineBtn = document.createElement('button');
-  lineBtn.type = 'button';
-  lineBtn.textContent = 'LINE 諮詢';
+  const lineBtn = document.createElement("button");
+  lineBtn.textContent = "LINE 諮詢";
+  lineBtn.type = "button";
   lineBtn.style.cssText = `
-    padding:8px 16px;font-size:14px;border-radius:6px;
-    border:1px solid #ccc;background:#06c755;color:white;
-    margin-left:10px;cursor:pointer;
+    padding:8px 14px;font-size:14px;
+    background:#06c755;color:#fff;
+    border:none;border-radius:5px;
+    cursor:pointer;
   `;
 
   btnWrap.appendChild(dlBtn);
   btnWrap.appendChild(lineBtn);
   box.appendChild(btnWrap);
 
-  // 表格 + 問答區
-  box.innerHTML += `
-    <table style="width:100%;border:1px solid #ddd;font-size:15px">
-      <tr><th style="width:35%">姓名</th><td>${info.name}</td></tr>
-      <tr><th>電話</th><td>${info.phone}</td></tr>
-      <tr><th>Line ID</th><td>${info.line}</td></tr>
-      <tr><th>生日</th><td>${info.bday}</td></tr>
-      <tr><th>職業</th><td>${info.job}</td></tr>
-    </table><br>
+  // 🔶 基本資料表格
+  const table = document.createElement("table");
+  table.style.cssText = "width:100%;border:1px solid #ddd;font-size:15px";
+  table.innerHTML = `
+    <tr><th style="width:35%">姓名</th><td>${info.name}</td></tr>
+    <tr><th>電話</th><td>${info.phone}</td></tr>
+    <tr><th>Line ID</th><td>${info.line}</td></tr>
+    <tr><th>生日</th><td>${info.bday}</td></tr>
+    <tr><th>職業</th><td>${info.job}</td></tr>
   `;
+  box.appendChild(table);
 
+  // 🔶 問答區
   qs.forEach((item, i) => {
-    box.innerHTML += `
-      <div class="qa-card">
-        <div class="question">Q${i + 1}. ${item.q}</div>
-        <div class="answer">👉 ${ans[i].value}</div>
-      </div>`;
+    const qaCard = document.createElement("div");
+    qaCard.className = "qa-card";
+    qaCard.innerHTML = `
+      <div class="question">Q${i + 1}. ${item.q}</div>
+      <div class="answer">👉 ${ans[i].value}</div>
+    `;
+    box.appendChild(qaCard);
   });
 
   form.appendChild(box);
 
-  // 建立圖片下載 Blob
+  // 🔶 建立下載圖檔
   const canvas = await html2canvas(box, { scale: 2 });
-  const blob   = await new Promise(r => canvas.toBlob(r, 'image/png'));
+  const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
   const imgURL = URL.createObjectURL(blob);
 
-  // 綁定按鈕功能（這一步必須等按鈕進 DOM 之後做）
+  // 🔶 綁定按鈕功能
   dlBtn.onclick = () => downloadPNG(imgURL);
   lineBtn.onclick = () => openLine();
 
-  box.scrollIntoView({ behavior: 'smooth' });
+  box.scrollIntoView({ behavior: "smooth" });
 }
-
   /* === 6A. 下載 PNG === */
   function downloadPNG (url) {
     const a = Object.assign(document.createElement('a'), {
