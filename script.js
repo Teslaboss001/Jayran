@@ -72,15 +72,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const jobSel = $("job");
 
   /* === 3. 下一步 === */
-  $("nextBtn").addEventListener("click", () => {
-    if (!($("name").value.trim() && $("phone").value.trim() &&
-          $("lineId").value.trim() && $("birthday").value)) {
-      alert("請完整填寫所有基本資料！");
-      return;
-    }
-    show("basicInfoSection", false);
-    show("questionSection",  true);
-  });
+ $("nextBtn").addEventListener("click", () => {
+  console.log("name:", $("name").value);
+  console.log("phone:", $("phone").value);
+  console.log("lineId:", $("lineId").value);
+  console.log("birthday:", $("birthday").value);
+
+  if (!($("name").value.trim() && $("phone").value.trim() &&
+        $("lineId").value.trim() && $("birthday").value)) {
+    alert("請完整填寫所有基本資料！");
+    return;
+  }
+
+  show("basicInfoSection", false);
+  show("questionSection",  true);
+});
 
   /* === 4. 選職業 → 產生問卷 === */
   jobSel.addEventListener("change", () => jobSel.value && buildQuestions());
