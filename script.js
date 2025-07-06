@@ -167,7 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* === 7. 下載 PNG → 跳 Line === */
-      const lineID = "@637zzurf";   // ← 改成你的
+          const lineID = "@637zzurf";   // ← 改成你的
     const msg    = encodeURIComponent("您好，我已完成健檢問卷，結果圖已下載，馬上傳給您！");
 
     try {
@@ -181,6 +181,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
 
         setTimeout(() => {
-          URL.revokeObjectURL(url);
-          window.location.href = `https://line.me/R/ti/p/${lineID}?text=${msg}`;
-        }, 800);
+  URL.revokeObjectURL(url);
+  window.open("https://line.me/R/ti/p/@637zzurf", "_blank");
+}, 800);
