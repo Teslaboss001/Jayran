@@ -190,6 +190,8 @@ async function downloadAndJump(el) {
     });
   } catch (e) {
     console.error(e);
-    alert("產生圖片失敗，請稍後再試");
+     alert("產生圖片失敗，請稍後再試");
+    }
   }
-}
+
+});
