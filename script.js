@@ -180,22 +180,22 @@ const spinQuestions = {
 
   /* === 7. 下載 PNG + 跳 Line === */
   async function handleSend(boxEl) {
-    const lineID = "@dvjch";   // <<--- 換成你的 Line ID
-    const msg = encodeURIComponent("您好，我已完成健檢問卷，結果圖已下載，馬上傳給您！");
+  const lineID = "@dvjch";  // 替換為你的 ID
+  const msg = encodeURIComponent("您好，我已完成健檢問卷，結果圖已下載，馬上傳給您！");
 
-    const canvas = await html2canvas(boxEl, { scale: 2 });
-    canvas.toBlob(blob => {
-  const url = URL.createObjectURL(blob);
-  const a   = document.createElement("a");
-  a.href = url;
-  a.download = "健檢問卷結果.png";
+  const canvas = await html2canvas(boxEl, { scale: 2 });
 
-  // 用 setTimeout 確保使用者觸發下載完成
-  a.click();
+  canvas.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const a   = document.createElement("a");
+    a.href = url;
+    a.download = "健檢問卷結果.png";
+    a.click();
 
-  // 等 1 秒後再跳轉至 Line（避免下載失敗）
-  setTimeout(() => {
-    URL.revokeObjectURL(url);
-    window.location.href = `https://line.me/R/ti/p/${dvjch}?text=${msg}`;
-  }, 1500); // 可依需要改為 1500ms
-});
+    // 等圖片觸發下載後再跳轉 Line
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+      window.location.href = `https://line.me/R/ti/p/${dvjch}?text=${msg}`;
+    }, 1000);
+  });
+}
