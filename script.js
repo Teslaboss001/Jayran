@@ -139,26 +139,53 @@ async function showResult(qs) {
   form.innerHTML = '';
   const box = document.createElement('div');
   box.className = 'result-container';
-  box.innerHTML = `
-    <h2>📝 您的健檢問卷結果</h2>
-    <p style="background:#fffae6;border:1px solid #f2c94c;padding:10px;
-              text-align:center;font-weight:600;margin-bottom:10px;">
-      請先下載健檢資料，再前往 LINE 諮詢
-    </p>
-    <div id="buttonGroup" style="text-align:center; margin-bottom:20px;">
-      <button id="downloadBtn" style="padding:8px 16px; font-size:14px; border-radius:6px;
-              border:1px solid #ccc; background:#fff; cursor:pointer;">下載健檢成果</button>
-      <button id="lineBtn" style="padding:8px 16px; font-size:14px; border-radius:6px;
-              border:1px solid #ccc; background:#06c755; color:white; margin-left:10px;
-              cursor:pointer;">LINE 諮詢</button>
-    </div>
+
+  // 提示文字
+  const notice = document.createElement('p');
+  notice.innerHTML = '請先下載健檢資料，再前往 LINE 諮詢';
+  notice.style.cssText = `
+    background:#fffae6;border:1px solid #f2c94c;padding:10px;
+    text-align:center;font-weight:600;margin-bottom:10px;
+  `;
+  box.appendChild(notice);
+
+  // 按鈕群組容器
+  const btnWrap = document.createElement('div');
+  btnWrap.style.cssText = `
+    text-align:center;margin-bottom:20px;
+  `;
+
+  const dlBtn = document.createElement('button');
+  dlBtn.type = 'button';
+  dlBtn.textContent = '下載健檢成果';
+  dlBtn.style.cssText = `
+    padding:8px 16px;font-size:14px;border-radius:6px;
+    border:1px solid #ccc;background:#fff;cursor:pointer;
+  `;
+
+  const lineBtn = document.createElement('button');
+  lineBtn.type = 'button';
+  lineBtn.textContent = 'LINE 諮詢';
+  lineBtn.style.cssText = `
+    padding:8px 16px;font-size:14px;border-radius:6px;
+    border:1px solid #ccc;background:#06c755;color:white;
+    margin-left:10px;cursor:pointer;
+  `;
+
+  btnWrap.appendChild(dlBtn);
+  btnWrap.appendChild(lineBtn);
+  box.appendChild(btnWrap);
+
+  // 表格 + 問答區
+  box.innerHTML += `
     <table style="width:100%;border:1px solid #ddd;font-size:15px">
       <tr><th style="width:35%">姓名</th><td>${info.name}</td></tr>
       <tr><th>電話</th><td>${info.phone}</td></tr>
       <tr><th>Line ID</th><td>${info.line}</td></tr>
       <tr><th>生日</th><td>${info.bday}</td></tr>
       <tr><th>職業</th><td>${info.job}</td></tr>
-    </table><br>`;
+    </table><br>
+  `;
 
   qs.forEach((item, i) => {
     box.innerHTML += `
@@ -167,15 +194,17 @@ async function showResult(qs) {
         <div class="answer">👉 ${ans[i].value}</div>
       </div>`;
   });
+
   form.appendChild(box);
 
+  // 建立圖片下載 Blob
   const canvas = await html2canvas(box, { scale: 2 });
   const blob   = await new Promise(r => canvas.toBlob(r, 'image/png'));
   const imgURL = URL.createObjectURL(blob);
 
-  // 綁定按鈕功能
-  document.getElementById('downloadBtn').onclick = () => downloadPNG(imgURL);
-  document.getElementById('lineBtn').onclick = openLine;
+  // 綁定按鈕功能（這一步必須等按鈕進 DOM 之後做）
+  dlBtn.onclick = () => downloadPNG(imgURL);
+  lineBtn.onclick = () => openLine();
 
   box.scrollIntoView({ behavior: 'smooth' });
 }
