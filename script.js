@@ -180,8 +180,20 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
           URL.revokeObjectURL(url);
           window.open(lineURL, "_blank");    // ✅ 0.8 秒後開啟 Line 戶
-        }, 1500);
+        }, 1000);
       });
+      /* 2. 同一次 click 連續觸發：先下載、再跳轉 */
+      a.click();                      // ① 下載
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      location.href = lineURL;        // ② 同 tab 直接開 Line
+    });
+  } catch (e) {
+    console.error(e);
+    alert("產生圖片失敗，請稍後再試");
+  }
+}
     } catch (e) {
       console.error(e);
       alert("產生圖片失敗，請稍後再試");
