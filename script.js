@@ -65,48 +65,52 @@ const spinQuestions = {
     { q: "這就像替自己加裝一層額外防護網，平常用不到，但關鍵時刻保護你和家人，你會想深入了解嗎？", options: ["想了解", "再看看",] }
   ]
 };
-// === 基本資料下一步 ===
+/* === 點「下一步」先驗證四個欄位 === */
 document.getElementById("nextBtn").addEventListener("click", () => {
-  const age = document.getElementById("age").value;
-  const income = document.getElementById("income").value;
-  const saving = document.getElementById("saving").value;
+  const name     = document.getElementById("name").value.trim();
+  const phone    = document.getElementById("phone").value.trim();
+  const lineId   = document.getElementById("lineId").value.trim();
+  const birthday = document.getElementById("birthday").value;
 
-  if (!age || !income || !saving) {
-    alert("請完整填寫基本資料");
+  if (!name || !phone || !lineId || !birthday) {
+    alert("請完整填寫所有基本資料！");
     return;
   }
-
+  /* 切換到問卷 */
   document.getElementById("basicInfoSection").style.display = "none";
-  document.getElementById("questionSection").style.display = "block";
+  document.getElementById("questionSection").style.display  = "block";
 });
 
-// === 載入問卷 ===
+/* === 選職業就載入問卷 === */
+document.getElementById("job").addEventListener("change", () => {
+  if (document.getElementById("job").value) loadQuestions();
+});
+
+/* === 載入問卷（radio 版）=== */
 function loadQuestions() {
-  const job = document.getElementById("job").value;
+  const job  = document.getElementById("job").value;
   const form = document.getElementById("questionForm");
   form.innerHTML = "";
 
   const qList = spinQuestions[job];
+  if (!qList) return;
 
   qList.forEach((item, i) => {
     const label = document.createElement("label");
-    label.innerText = `Q${i + 1}. ${item.q}`;
-    label.style.display = "block";
-    label.style.marginTop = "15px";
+    label.textContent = `Q${i + 1}. ${item.q}`;
     form.appendChild(label);
 
     item.options.forEach(opt => {
-      const line = document.createElement("div");
-      line.style.marginLeft = "12px";
+      const line  = document.createElement("div");
 
       const radio = document.createElement("input");
-      radio.type = "radio";
-      radio.name = `q${i}`;
+      radio.type  = "radio";
+      radio.name  = `q${i}`;
       radio.value = opt;
       radio.required = true;
 
-      const span = document.createElement("span");
-      span.innerText = " " + opt;
+      const span  = document.createElement("span");
+      span.textContent = " " + opt;
 
       line.appendChild(radio);
       line.appendChild(span);
@@ -114,59 +118,57 @@ function loadQuestions() {
     });
   });
 
-  const submitBtn = document.createElement("button");
-  submitBtn.textContent = "開始評估";
-  submitBtn.type = "button";
-  submitBtn.style.marginTop = "25px";
+  /* 送出按鈕 */
+  const btn = document.createElement("button");
+  btn.textContent = "開始評估";
+  btn.type = "button";
+  btn.style.marginTop = "25px";
+  btn.onclick = () => showResult(qList);
+  form.appendChild(btn);
 
-  submitBtn.onclick = () => {
-    const answers = [];
-    for (let i = 0; i < qList.length; i++) {
-      const sel = form.querySelector(`input[name="q${i}"]:checked`);
-      if (!sel) {
-        alert(`請回答第 ${i + 1} 題`);
-        return;
-      }
-      answers.push(sel.value);
-    }
-
-    const age = document.getElementById("age").value;
-    const income = document.getElementById("income").value;
-    const saving = document.getElementById("saving").value;
-
-    form.innerHTML = "";
-    const box = document.createElement("div");
-    box.className = "result-container";
-
-    box.innerHTML = `
-      <h2>📝 您的健檢問卷結果如下</h2>
-      <p>
-        年齡：${age} 歲<br>
-        平均月收入：${income} 元<br>
-        是否有儲蓄習慣：${saving}<br>
-        職業類別：${job}
-      </p>
-    `;
-
-    qList.forEach((item, i) => {
-      const card = document.createElement("div");
-      card.className = "qa-card";
-      card.innerHTML = `
-        <div class="question">Q${i + 1}. ${item.q}</div>
-        <div class="answer">👉 ${answers[i]}</div>
-      `;
-      box.appendChild(card);
-    });
-
-    form.appendChild(box);
-  };
-
-  form.appendChild(submitBtn);
-  form.scrollIntoView({ behavior: 'smooth' }); // ✅ 滑到問卷區塊
+  form.scrollIntoView({ behavior: "smooth" });
 }
 
-// === 選擇職業 → 載入問卷
-document.getElementById("job").addEventListener("change", () => {
-  const jobVal = document.getElementById("job").value;
-  if (jobVal) loadQuestions();
-});
+/* === 顯示結果 === */
+function showResult(qList) {
+  const form = document.getElementById("questionForm");
+  const job  = document.getElementById("job").value;
+
+  /* 收集答案並檢查 */
+  const answers = qList.map((_, i) =>
+    form.querySelector(`input[name="q${i}"]:checked`));
+  const miss = answers.findIndex(a => !a);
+  if (miss !== -1) return alert(`請回答第 ${miss + 1} 題！`);
+
+  /* 讀基本資料 */
+  const name     = document.getElementById("name").value;
+  const phone    = document.getElementById("phone").value;
+  const lineId   = document.getElementById("lineId").value;
+  const birthday = document.getElementById("birthday").value;
+
+  /* 組結果頁 */
+  form.innerHTML = "";
+  const box = document.createElement("div");
+  box.className = "result-container";
+  box.innerHTML = `
+    <h2>📝 您的健檢問卷結果如下</h2>
+    <p>
+      姓名：${name}<br>
+      電話：${phone}<br>
+      Line ID：${lineId}<br>
+      生日：${birthday}<br>
+      職業類別：${job}
+    </p>
+  `;
+
+  qList.forEach((item, i) => {
+    box.innerHTML += `
+      <div class="qa-card">
+        <div class="question">Q${i + 1}. ${item.q}</div>
+        <div class="answer">👉 ${answers[i].value}</div>
+      </div>`;
+  });
+
+  form.appendChild(box);
+  box.scrollIntoView({ behavior: "smooth" });
+}
