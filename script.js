@@ -185,15 +185,17 @@ const spinQuestions = {
 
     const canvas = await html2canvas(boxEl, { scale: 2 });
     canvas.toBlob(blob => {
-      const url = URL.createObjectURL(blob);
-      const a   = document.createElement("a");
-      a.href = url;
-      a.download = "健檢問卷結果.png";
-      a.click();
-      URL.revokeObjectURL(url);
+  const url = URL.createObjectURL(blob);
+  const a   = document.createElement("a");
+  a.href = url;
+  a.download = "健檢問卷結果.png";
 
-      window.location.href = `https://line.me/R/ti/p/${lineID}?text=${msg}`;
-    });
-  }
+  // 用 setTimeout 確保使用者觸發下載完成
+  a.click();
 
+  // 等 1 秒後再跳轉至 Line（避免下載失敗）
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+    window.location.href = `https://line.me/R/ti/p/${dvjch}?text=${msg}`;
+  }, 1500); // 可依需要改為 1500ms
 });
