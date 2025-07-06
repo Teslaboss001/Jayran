@@ -29,16 +29,17 @@
     </div>
 
     <!-- 第二階段：選職業 + 問卷 -->
-    <div id="questionSection" style="display: none;">
-      <label for="job">請選擇您的職業類別：</label>
-      <select id="job" onchange="loadQuestions()">
-        <option disabled selected>請選擇</option>
-        <option>一般上班族</option>
-        <option>自營業者</option>
-        <option>領導主管</option>
-        <option>計程車司機</option>
-        <option>公職/醫療</option>
-      </select>
+    <div class="center-wrapper">
+  <label for="job">請選擇您的職業類別：</label>
+  <select id="job">
+    <option value="">請選擇</option>
+    <option value="一般上班族">一般上班族</option>
+    <option value="自營業者">自營業者</option>
+    <option value="領導主管">領導主管</option>
+    <option value="計程車司機">計程車司機</option>
+    <option value="公職/醫療">公職/醫療</option>
+  </select>
+</div>
 
       <form id="questionForm"></form>
     </div>
