@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
   $('nextBtn').addEventListener('click', () => {
     if (!($('name').value.trim() &&
           $('phone').value.trim() &&
-          $('lineID').value.trim() &&
+          $('lineId').value.trim() &&
           $('birthday').value)) {
       alert('請完整填寫所有基本資料！');
       return;
