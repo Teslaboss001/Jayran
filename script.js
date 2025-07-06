@@ -176,3 +176,6 @@ document.getElementById("job").addEventListener("change", () => {
   const jobVal = document.getElementById("job").value;
   if (jobVal) loadQuestions();   // 有選到職業 → 載入題目
 });
+document.getElementById("job").addEventListener("change", () => {
+  if (document.getElementById("job").value) loadQuestions();
+});
