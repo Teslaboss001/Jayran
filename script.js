@@ -153,31 +153,19 @@ async function showResult(qs) {
 const btnWrap = document.createElement("div");
 btnWrap.style.cssText = "text-align:center; margin-bottom:20px;";
 
-// ✅ 下載按鈕：直接用 <a>，style 做成像按鈕
-// 建立「下載健檢成果」— 用 <a>
-const dlBtn = document.createElement("a");
+// ✅ 下載按鈕：淺藍底、黑字
+const dlBtn = document.createElement("button");
 dlBtn.textContent = "下載健檢成果";
+dlBtn.type = "button";
 dlBtn.style.cssText = `
-  display:inline-block;
   padding:8px 16px;
   font-size:15px;
   background:#e0f0ff;
   color:#000;
   border:1px solid #66aadd;
   border-radius:6px;
-  text-decoration:none;
   cursor:pointer;
 `;
-
-// 🔶 建立下載圖檔
-const canvas = await html2canvas(box, { scale: 2 });
-const blob   = await new Promise(r => canvas.toBlob(r, "image/png"));
-const imgURL = URL.createObjectURL(blob);
-
-// ✅ 把連結真正指到圖片 & download 名稱，**不用再程式 click()**
--dlBtn.onclick  = () => downloadPNG(imgURL);
-+dlBtn.href     = imgURL;
-+dlBtn.download = "健檢問卷結果.png";
 
 // ✅ LINE 諮詢按鈕
 const lineBtn = document.createElement("button");
@@ -228,38 +216,26 @@ box.appendChild(btnWrap);
   form.appendChild(box);
 
   // 🔶 建立下載圖檔
-const canvas = await html2canvas(box, { scale: 2 });
-const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
-const imgURL = URL.createObjectURL(blob);
+  const canvas = await html2canvas(box, { scale: 2 });
+  const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
+  const imgURL = URL.createObjectURL(blob);
 
-// ✅ 在產生完圖片 URL 後再綁定按鈕
-dlBtn.onclick = () => downloadPNG(imgURL);
-lineBtn.onclick = () => openLine();
+  // 🔶 綁定按鈕功能
+  dlBtn.onclick = () => downloadPNG(imgURL);
+  lineBtn.onclick = () => openLine();
 
   box.scrollIntoView({ behavior: "smooth" });
 }
   /* === 6A. 下載 PNG === */
-function downloadPNG (url) {
-  /* 1️⃣  主流瀏覽器（Chrome / Edge / Android-Chrome）— 用 a.download */
-  const a = document.createElement('a');
-  if ('download' in a) {                 // feature-detect
-    a.href      = url;
-    a.download  = '健檢問卷結果.png';
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    return;                              // ✅ 完成
-  }
-
-  /* 2️⃣  iOS Safari / LINE 內建瀏覽器 — fallback：開新分頁讓使用者長按另存 */
-  const win = window.open(url, '_blank');
-  if (!win) {
-    alert('瀏覽器阻擋了彈窗，請在 Safari／Chrome 開啟此頁再下載');
-  } else {
-    alert('開啟圖片新分頁後，長按圖片即可「加入相片」或另存');
-  }
+function downloadPNG(blobURL) {
+  const a = document.createElement("a");
+  a.href = blobURL;
+  a.download = "健檢問卷結果.png";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
+
   /* === 6B. 開啟 LINE === */
   function openLine () {
     const lineID = '@637zzurf';
