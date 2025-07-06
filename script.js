@@ -183,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         setTimeout(() => {
           URL.revokeObjectURL(url);
-          window.location.href = `https://line.me/R/ti/p/${lineID}?text=${msg}`;
+          window.location.href = `https://line.me/R/ti/p/@637zzurf`;
         }, 800);
       });
     } catch (e) {
