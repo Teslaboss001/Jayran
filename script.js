@@ -122,107 +122,65 @@ document.addEventListener("DOMContentLoaded", () => {
     form.scrollIntoView({ behavior: 'smooth' });
   }
 
-  /* === 5. 顯示結果（含提示、下載、LINE 按鈕） === */
+ /* === 5. 顯示結果（重寫）=== */
 async function showResult(qs) {
-  const ans = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
+  /* ---------- 驗證 ---------- */
+  const ans  = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
   const miss = ans.findIndex(a => !a);
   if (miss !== -1) return alert(`請回答第 ${miss + 1} 題！`);
 
+  /* ---------- 組結果 HTML ---------- */
   const info = {
-    name: $("name").value,
+    name : $("name").value,
     phone: $("phone").value,
-    line: $("lineId").value,
-    bday: $("birthday").value,
-    job: jobSel.value
+    line : $("lineId").value,
+    bday : $("birthday").value,
+    job  : jobSel.value
   };
 
   form.innerHTML = "";
   const box = document.createElement("div");
   box.className = "result-container";
-
-  // 🔶 提示文字
-  const notice = document.createElement("p");
-  notice.innerHTML = "請先下載健檢資料，再前往 LINE 諮詢";
-  notice.style.cssText = `
-    background:#fffae6;border:1px solid #f2c94c;padding:10px;
-    text-align:center;font-weight:600;margin-bottom:15px;
-  `;
-  box.appendChild(notice);
-
- // 🔶 建立圖片下載按鈕 & Line 按鈕（修正版）
-const btnWrap = document.createElement("div");
-btnWrap.style.cssText = "text-align:center; margin-bottom:20px;";
-
-// ✅ 下載按鈕：淺藍底、黑字
-const dlBtn = document.createElement("button");
-dlBtn.textContent = "下載健檢成果";
-dlBtn.type = "button";
-dlBtn.style.cssText = `
-  padding:8px 16px;
-  font-size:15px;
-  background:#e0f0ff;
-  color:#000;
-  border:1px solid #66aadd;
-  border-radius:6px;
-  cursor:pointer;
-`;
-
-// ✅ LINE 諮詢按鈕
-const lineBtn = document.createElement("button");
-lineBtn.textContent = "LINE 諮詢";
-lineBtn.type = "button";
-lineBtn.style.cssText = `
-  padding:8px 16px;
-  font-size:15px;
-  background:#06c755;
-  color:#fff;
-  border:none;
-  border-radius:6px;
-  margin-left:10px;
-  cursor:pointer;
-`;
-
-// 綁定點擊功能
-dlBtn.onclick = () => downloadPNG(imgURL);
-lineBtn.onclick = () => openLine();
-
-btnWrap.appendChild(dlBtn);
-btnWrap.appendChild(lineBtn);
-box.appendChild(btnWrap);
-
-  // 🔶 基本資料表格
-  const table = document.createElement("table");
-  table.style.cssText = "width:100%;border:1px solid #ddd;font-size:15px";
-  table.innerHTML = `
-    <tr><th style="width:35%">姓名</th><td>${info.name}</td></tr>
-    <tr><th>電話</th><td>${info.phone}</td></tr>
-    <tr><th>Line ID</th><td>${info.line}</td></tr>
-    <tr><th>生日</th><td>${info.bday}</td></tr>
-    <tr><th>職業</th><td>${info.job}</td></tr>
-  `;
-  box.appendChild(table);
-
-  // 🔶 問答區
+  box.innerHTML = `
+    <h2>📝 您的健檢問卷結果</h2>
+    <p class="notice">請先下載健檢資料，再前往 LINE 諮詢</p>
+    <table class="info-table">
+      <tr><th>姓名</th><td>${info.name}</td></tr>
+      <tr><th>電話</th><td>${info.phone}</td></tr>
+      <tr><th>Line&nbsp;ID</th><td>${info.line}</td></tr>
+      <tr><th>生日</th><td>${info.bday}</td></tr>
+      <tr><th>職業</th><td>${info.job}</td></tr>
+    </table>`;
   qs.forEach((item, i) => {
-    const qaCard = document.createElement("div");
-    qaCard.className = "qa-card";
-    qaCard.innerHTML = `
-      <div class="question">Q${i + 1}. ${item.q}</div>
-      <div class="answer">👉 ${ans[i].value}</div>
-    `;
-    box.appendChild(qaCard);
+    box.innerHTML += `
+      <div class="qa-card">
+        <div class="question">Q${i + 1}. ${item.q}</div>
+        <div class="answer">👉 ${ans[i].value}</div>
+      </div>`;
   });
-
   form.appendChild(box);
 
-  // 🔶 建立下載圖檔
-  const canvas = await html2canvas(box, { scale: 2 });
-  const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
+  /* ---------- 先生成圖片 ---------- */
+  const canvas = await html2canvas(box, { scale: 2, useCORS: true });
+  const blob   = await new Promise(r => canvas.toBlob(r, "image/png"));
   const imgURL = URL.createObjectURL(blob);
 
-  // 🔶 綁定按鈕功能
+  /* ---------- 再建立按鈕 ---------- */
+  const btnWrap = document.createElement("div");
+  btnWrap.className = "btn-wrap";   // 用 CSS 排版
+
+  const dlBtn  = document.createElement("button");
+  dlBtn.className = "dl-btn";
+  dlBtn.textContent = "下載健檢成果";
   dlBtn.onclick = () => downloadPNG(imgURL);
-  lineBtn.onclick = () => openLine();
+
+  const lineBtn = document.createElement("button");
+  lineBtn.className = "line-btn";
+  lineBtn.textContent = "LINE 諮詢";
+  lineBtn.onclick = openLine;
+
+  btnWrap.append(dlBtn, lineBtn);
+  notice.after(btnWrap);            // ➜ 插到黃條「正下方」
 
   box.scrollIntoView({ behavior: "smooth" });
 }
