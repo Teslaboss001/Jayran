@@ -3,32 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>冠智關心您 - 市調評估</title>
+  <title>冠智的市調評估</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
   <div class="overlay">
 
-    <!-- === ① 基本資料區 === -->
-    <div id="basicInfoSection">
-      <h1>冠智關心您 - 市調評估問卷</h1>
+    <!-- === 基本資料區 === -->
+<div id="basicInfoSection">
+  <h1>冠智關心您 - 健檢問卷</h1>
 
-      <label>年齡：</label>
-      <input type="number" id="age" placeholder="例如 35" required>
+  <!-- 姓名 -->
+  <label>姓名：</label>
+  <input type="text" id="name" placeholder="例如 王小明" required>
 
-      <label>平均月收入：</label>
-      <input type="number" id="income" placeholder="例如 60000" required>
+  <!-- 電話 -->
+  <label>聯絡電話：</label>
+  <input type="tel" id="phone" placeholder="例如 0912345678" required>
 
-      <label>是否有儲蓄習慣？</label>
-      <select id="saving" required>
-        <option value="">請選擇</option>
-        <option>是</option>
-        <option>否</option>
-      </select>
+  <!-- Line ID -->
+  <label>Line ID：</label>
+  <input type="text" id="lineId" placeholder="例如 myline123" required>
 
-      <button id="nextBtn">下一步</button>
-    </div>
+  <!-- 生日（使用日期選擇器）-->
+  <label>生日：</label>
+  <input type="date" id="birthday" required>
+
+  <!-- 原本的欄位 -->
+  <label>年齡：</label>
+  <input type="number" id="age" placeholder="例如 35" required>
+
+  <label>平均月收入：</label>
+  <input type="number" id="income" placeholder="例如 60000" required>
+
+  <label>是否有儲蓄習慣？</label>
+  <select id="saving" required>
+    <option value="">請選擇</option>
+    <option>是</option>
+    <option>否</option>
+  </select>
+
+  <button id="nextBtn">下一步</button>
+</div>
 
     <!-- === ② 職業選擇 + 問卷區（初始隱藏） === -->
     <div id="questionSection" style="display:none;">
