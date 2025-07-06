@@ -227,15 +227,27 @@ box.appendChild(btnWrap);
   box.scrollIntoView({ behavior: "smooth" });
 }
   /* === 6A. 下載 PNG === */
-function downloadPNG(blobURL) {
-  const a = document.createElement("a");
-  a.href = blobURL;
-  a.download = "健檢問卷結果.png";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
+function downloadPNG (url) {
+  /* 1️⃣  主流瀏覽器（Chrome / Edge / Android-Chrome）— 用 a.download */
+  const a = document.createElement('a');
+  if ('download' in a) {                 // feature-detect
+    a.href      = url;
+    a.download  = '健檢問卷結果.png';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    return;                              // ✅ 完成
+  }
 
+  /* 2️⃣  iOS Safari / LINE 內建瀏覽器 — fallback：開新分頁讓使用者長按另存 */
+  const win = window.open(url, '_blank');
+  if (!win) {
+    alert('瀏覽器阻擋了彈窗，請在 Safari／Chrome 開啟此頁再下載');
+  } else {
+    alert('開啟圖片新分頁後，長按圖片即可「加入相片」或另存');
+  }
+}
   /* === 6B. 開啟 LINE === */
   function openLine () {
     const lineID = '@637zzurf';
