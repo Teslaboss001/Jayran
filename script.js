@@ -190,7 +190,7 @@ async function downloadAndJump(el) {
       setTimeout(() => {
         URL.revokeObjectURL(url);               // 清資源
         location.href = lineURL;                // ② 同分頁開 Line
-      }, 200);                                  // 0.2 秒就夠，體感感覺不到
+      }, 1500);                                  // 0.2 秒就夠，體感感覺不到
     });
   } catch (err) {
     console.error(err);
