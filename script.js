@@ -180,7 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
           URL.revokeObjectURL(url);
           window.open(lineURL, "_blank");    // ✅ 0.8 秒後開啟 Line 戶
-        }, 2000);
+        }, 1500);
       });
     } catch (e) {
       console.error(e);
