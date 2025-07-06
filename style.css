@@ -176,3 +176,7 @@ button:hover {
   border-radius: 6px;
   border: 1px solid #ccc;
 }
+/* 讓問卷卡片與職業選單保持間距 */
+#questionForm {
+  margin-top: 25px;
+}
