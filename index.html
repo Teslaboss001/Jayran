@@ -10,30 +10,27 @@
 <body>
   <div class="overlay">
 
-    <!-- === 基本資料區 === -->
-<div id="basicInfoSection">
-  <h1>冠智關心您-健檢問卷</h1>
+    <!-- === ① 基本資料區 === -->
+    <div id="basicInfoSection">
+      <h1>冠智關心您 - 健檢問卷</h1>
 
-  <!-- 姓名 -->
-  <label>姓名：</label>
-  <input type="text" id="name" placeholder="例如 王小明" required>
+      <label>姓名：</label>
+      <input type="text" id="name" placeholder="例如 王小明" required>
 
-  <!-- 電話 -->
-  <label>聯絡電話：</label>
-  <input type="tel" id="phone" placeholder="例如 0912345678" required>
+      <label>聯絡電話：</label>
+      <input type="tel" id="phone" placeholder="例如 0912345678" required>
 
-  <!-- Line ID -->
-  <label>Line ID：</label>
-  <input type="text" id="lineId" placeholder="例如 myline123" required>
+      <label>Line ID：</label>
+      <input type="text" id="lineId" placeholder="例如 myline123" required>
 
-  <!-- 生日（使用日期選擇器）-->
-  <label>生日：</label>
-  <input type="date" id="birthday" required>
+      <label>生日：</label>
+      <input type="date" id="birthday" required>
 
-  <button id="nextBtn" type="button">下一步</button>
-</div>
+      <!-- type="button" 避免提交 -->
+      <button id="nextBtn" type="button">下一步</button>
+    </div>
 
-    <!-- === ② 職業選擇 + 問卷區（初始隱藏） === -->
+    <!-- === ② 職業 + 問卷區（隱藏） === -->
     <div id="questionSection" style="display:none;">
       <div class="center-wrapper">
         <label for="job">請選擇您的職業類別：</label>
@@ -53,6 +50,7 @@
 
   </div>
 
+  <!-- 最後引用 JavaScript，放在 body 最底部 -->
   <script src="script.js"></script>
 </body>
 </html>
