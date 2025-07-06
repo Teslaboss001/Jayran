@@ -168,7 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* === 7. 下載 PNG → 跳 Line === */
   async function downloadAndJump(el) {
-    const lineID = "dvjch";   // ← 改成你的
+    const lineID = "@637zzurf";   // ← 改成你的
     const msg    = encodeURIComponent("您好，我已完成健檢問卷，結果圖已下載，馬上傳給您！");
 
     try {
