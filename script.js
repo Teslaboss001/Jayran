@@ -66,18 +66,18 @@ document.addEventListener("DOMContentLoaded", () => {
     { q: "這就像替自己加裝一層額外防護網，平常用不到，但關鍵時刻保護你和家人，你會想深入了解嗎？", options: ["想了解", "再看看",] }
   ]
 };
-        /* === 2. DOM 快捷 === */
-  const $ = id => document.getElementById(id);
-  const show = (id, flag) => $(id).style.display = flag ? "block" : "none";
-  const form   = $("questionForm");
+      /* === 2. DOM 快捷 === */
+  const $     = id => document.getElementById(id);
+  const show  = (id, flag) => $(id).style.display = flag ? "block" : "none";
+  const form  = $("questionForm");
   const jobSel = $("job");
 
   /* === 3. 下一步 === */
   $("nextBtn").addEventListener("click", () => {
     const ok =
-      $("name").value.trim()     &&
-      $("phone").value.trim()    &&
-      $("lineId").value.trim()   &&
+      $("name").value.trim()   &&
+      $("phone").value.trim()  &&
+      $("lineId").value.trim() &&
       $("birthday").value;
     if (!ok) return alert("請完整填寫所有基本資料！");
 
@@ -85,10 +85,9 @@ document.addEventListener("DOMContentLoaded", () => {
     show("questionSection",  true);
   });
 
-  /* === 4. 選職業 → 問卷 === */
+  /* === 4. 選職業 → 產生問卷 === */
   jobSel.addEventListener("change", () => jobSel.value && buildQuestions());
 
-  /* === 5. 動態產生問卷 === */
   function buildQuestions() {
     const qs = spinQuestions[jobSel.value] || [];
     form.innerHTML = "";
@@ -115,11 +114,10 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.style.marginTop = "25px";
     btn.onclick = () => showResult(qs);
     form.appendChild(btn);
-
     form.scrollIntoView({ behavior: "smooth" });
   }
 
-  /* === 6. 顯示結果 === */
+  /* === 5. 顯示結果 === */
   function showResult(qs) {
     const ans  = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
     const miss = ans.findIndex(a => !a);
@@ -165,33 +163,30 @@ document.addEventListener("DOMContentLoaded", () => {
     form.appendChild(box);
     box.scrollIntoView({ behavior: "smooth" });
   }
-  // === 7. 下載 PNG → 跳 Line ===
-function downloadAndJump(el) {
-  const lineID = "@637zzurf";
-  const msg = encodeURIComponent("您好，我已完成健檢問卷，結果圖已下載，馬上傳給您！");
 
-  try {
-    html2canvas(el, { scale: 2 }).then(canvas => {
+  /* === 6. 下載 PNG → 跳 Line === */
+  async function downloadAndJump(el) {
+    const lineID = "@637zzurf";                        // 你的官方 ID，保留 @
+    const lineURL = `https://line.me/R/ti/p/${encodeURIComponent(lineID)}`;
+    try {
+      const canvas = await html2canvas(el, { scale: 2 });
       canvas.toBlob(blob => {
         const url = URL.createObjectURL(blob);
 
         const a = Object.assign(document.createElement("a"), {
-          href: url,
-          download: "健檢問卷結果.png",
-          style: "display:none"
+          href: url, download: "健檢問卷結果.png", style: "display:none"
         });
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
 
         setTimeout(() => {
           URL.revokeObjectURL(url);
-          window.open("https://line.me/R/ti/p/@637zzurf", "_blank");
+          window.open(lineURL, "_blank");    // ✅ 0.8 秒後開啟 Line 戶
         }, 800);
       });
-    });
-  } catch (e) {
-    console.error(e);
-    alert("產生圖片失敗，請稍後再試");
+    } catch (e) {
+      console.error(e);
+      alert("產生圖片失敗，請稍後再試");
+    }
   }
-}
+
+});   //  <— 千萬要有！關閉 DOMContentLoaded   
