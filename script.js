@@ -170,4 +170,9 @@ function loadQuestions() {
   };
 
   form.appendChild(submitBtn);
-}喔
+}
+/* 加在 nextBtn 點擊函式後面，或檔案最底都行 */
+document.getElementById("job").addEventListener("change", () => {
+  const jobVal = document.getElementById("job").value;
+  if (jobVal) loadQuestions();   // 有選到職業 → 載入題目
+});
