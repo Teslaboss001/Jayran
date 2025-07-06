@@ -65,82 +65,80 @@ document.addEventListener("DOMContentLoaded", () => {
     { q: "這就像替自己加裝一層額外防護網，平常用不到，但關鍵時刻保護你和家人，你會想深入了解嗎？", options: ["想了解", "再看看"] }
   ]
 };
-    /* === 2. DOM 快捷 === */
+     /* === 2. DOM 快捷 === */
   const $    = id => document.getElementById(id);
-  const show = (id, f) => ($(id).style.display = f ? "block" : "none");
-  const form   = $("questionForm");
-  const jobSel = $("job");
+  const show = (id, flag) => { $(id).style.display = flag ? 'block' : 'none'; };
+
+  const form   = $('questionForm');
+  const jobSel = $('job');
 
   /* === 3. 下一步 === */
- $("nextBtn").addEventListener("click", () => {
-  console.log("name:", $("name").value);
-  console.log("phone:", $("phone").value);
-  console.log("lineId:", $("lineId").value);
-  console.log("birthday:", $("birthday").value);
-
-  if (!($("name").value.trim() && $("phone").value.trim() &&
-        $("lineId").value.trim() && $("birthday").value)) {
-    alert("請完整填寫所有基本資料！");
-    return;
-  }
-
-  show("basicInfoSection", false);
-  show("questionSection",  true);
-});
+  $('nextBtn').addEventListener('click', () => {
+    if (!($('name').value.trim() &&
+          $('phone').value.trim() &&
+          $('lineId').value.trim() &&
+          $('birthday').value)) {
+      alert('請完整填寫所有基本資料！');
+      return;
+    }
+    show('basicInfoSection', false);
+    show('questionSection',  true);
+  });
 
   /* === 4. 選職業 → 產生問卷 === */
-  jobSel.addEventListener("change", () => jobSel.value && buildQuestions());
+  jobSel.addEventListener('change', () => jobSel.value && buildQuestions());
 
-  function buildQuestions() {
+  function buildQuestions () {
     const qs = spinQuestions[jobSel.value] || [];
-    form.innerHTML = "";
+    form.innerHTML = '';
 
     qs.forEach((item, i) => {
-      const label = document.createElement("label");
+      const label = document.createElement('label');
       label.textContent = `Q${i + 1}. ${item.q}`;
       form.appendChild(label);
 
       item.options.forEach(opt => {
-        const wrap  = document.createElement("div");
-        const radio = Object.assign(document.createElement("input"), {
-          type: "radio", name: `q${i}`, value: opt, required: true
+        const wrap  = document.createElement('div');
+        const radio = Object.assign(document.createElement('input'), {
+          type : 'radio',
+          name : `q${i}`,
+          value: opt,
+          required: true
         });
         wrap.appendChild(radio);
-        wrap.append(" " + opt);
+        wrap.append(' ' + opt);
         form.appendChild(wrap);
       });
     });
 
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.textContent = "開始評估";
-    btn.style.marginTop = "25px";
+    const btn = Object.assign(document.createElement('button'), {
+      type: 'button',
+      textContent: '開始評估',
+      style: 'margin-top:25px'
+    });
     btn.onclick = () => showResult(qs);
     form.appendChild(btn);
 
-    form.scrollIntoView({ behavior: "smooth" });
+    form.scrollIntoView({ behavior: 'smooth' });
   }
 
-  /* === 5. 顯示結果（含提示、下載、Line 按鈕） === */
-  async function showResult(qs) {
-    /* 驗證是否答完 */
+  /* === 5. 顯示結果（含提示、下載、LINE 按鈕） === */
+  async function showResult (qs) {
     const ans  = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
     const miss = ans.findIndex(a => !a);
     if (miss !== -1) return alert(`請回答第 ${miss + 1} 題！`);
 
-    /* 基本資料 */
     const info = {
-      name : $("name").value,
-      phone: $("phone").value,
-      line : $("lineId").value,
-      bday : $("birthday").value,
+      name : $('name').value,
+      phone: $('phone').value,
+      line : $('lineId').value,
+      bday : $('birthday').value,
       job  : jobSel.value
     };
 
-    /* 建立結果區塊 */
-    form.innerHTML = "";
-    const box = document.createElement("div");
-    box.className = "result-container";
+    form.innerHTML = '';
+    const box = document.createElement('div');
+    box.className = 'result-container';
     box.innerHTML = `
       <h2>📝 您的健檢問卷結果</h2>
       <p style="background:#fffae6;border:1px solid #f2c94c;padding:10px;
@@ -150,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <table style="width:100%;border:1px solid #ddd;font-size:15px">
         <tr><th style="width:35%">姓名</th><td>${info.name}</td></tr>
         <tr><th>電話</th><td>${info.phone}</td></tr>
-        <tr><th>Line&nbsp;ID</th><td>${info.line}</td></tr>
+        <tr><th>Line ID</th><td>${info.line}</td></tr>
         <tr><th>生日</th><td>${info.bday}</td></tr>
         <tr><th>職業</th><td>${info.job}</td></tr>
       </table><br>`;
@@ -163,64 +161,59 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     form.appendChild(box);
 
-    /* 先把結果轉成圖片 URL（Blob） */
+    /* 轉成圖片（Blob URL）*/
     const canvas = await html2canvas(box, { scale: 2 });
-    const blob   = await new Promise(r => canvas.toBlob(r, "image/png"));
+    const blob   = await new Promise(r => canvas.toBlob(r, 'image/png'));
     const imgURL = URL.createObjectURL(blob);
 
     /* 下載健檢成果 */
-    const dlBtn = document.createElement("button");
-    dlBtn.type  = "button";
-    dlBtn.textContent = "下載健檢成果";
+    const dlBtn = document.createElement('button');
+    dlBtn.type  = 'button';
+    dlBtn.textContent = '下載健檢成果';
     dlBtn.onclick = () => downloadPNG(imgURL);
 
     /* LINE 諮詢 */
-    const lineBtn = document.createElement("button");
-    lineBtn.type  = "button";
-    lineBtn.textContent = "LINE 諮詢";
-    lineBtn.style.marginLeft = "10px";
-    lineBtn.onclick = () => openLine();
+    const lineBtn = document.createElement('button');
+    lineBtn.type  = 'button';
+    lineBtn.textContent = 'LINE 諮詢';
+    lineBtn.style.marginLeft = '10px';
+    lineBtn.onclick = openLine;
 
-    /* 按鈕容器（排成一列） */
-    const btnWrap = document.createElement("div");
-    btnWrap.style.marginTop = "20px";
-    btnWrap.appendChild(dlBtn);
-    btnWrap.appendChild(lineBtn);
+    const btnWrap = document.createElement('div');
+    btnWrap.style.marginTop = '20px';
+    btnWrap.append(dlBtn, lineBtn);
     form.appendChild(btnWrap);
 
-    box.scrollIntoView({ behavior: "smooth" });
+    box.scrollIntoView({ behavior: 'smooth' });
   }
 
-  /* === 6A. 下載圖片（所有環境皆可） === */
-  function downloadPNG(blobURL) {
-    const a = document.createElement("a");
-    a.href = blobURL;
-    a.download = "健檢問卷結果.png";
-    a.style.display = "none";
+  /* === 6A. 下載 PNG === */
+  function downloadPNG (url) {
+    const a = Object.assign(document.createElement('a'), {
+      href: url,
+      download: '健檢問卷結果.png',
+      style: 'display:none'
+    });
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    /* 不跳轉任何頁面，使用者可自行回上一頁或點 LINE 按鈕 */
   }
 
-  /* === 6B. 開啟 LINE 加好友 === */
-  function openLine() {
-  const lineID = "@637zzurf";  // ✅ 用半形 @
-  const noAt   = lineID.slice(1);
-  const ua     = navigator.userAgent;
-  const inLine = /\bLine\//i.test(ua);
-  const isiOS  = /iPad|iPhone|iPod/.test(ua);
+  /* === 6B. 開啟 LINE === */
+  function openLine () {
+    const lineID = '@637zzurf';
+    const noAt   = lineID.slice(1);
+    const ua     = navigator.userAgent;
+    const inLine = /Line\//i.test(ua);
+    const isiOS  = /iPad|iPhone|iPod/.test(ua);
 
-  if (inLine) {
-    location.href = `https://line.me/R/ti/p/%40${noAt}`;
-    return;
-  }
-
-  const deep =
-    isiOS
-      ? `line://ti/p/${lineID}`
+    if (inLine) {
+      location.href = `https://line.me/R/ti/p/%40${noAt}`;
+      return;
+    }
+    const deep = isiOS
+      ? `line://ti/p/${noAt}`
       : `intent://ti/p/${noAt}#Intent;scheme=line;package=jp.naver.line.android;end`;
-
-  location.href = deep;
-}
-}); /* -------- DOMContentLoaded END -----   
+    location.href = deep;
+  }
+}); /* -------- DOMContentLoaded END -------- */
