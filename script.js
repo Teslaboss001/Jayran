@@ -123,69 +123,62 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* === 5. 顯示結果（含提示、下載、LINE 按鈕） === */
-  async function showResult (qs) {
-    const ans  = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
-    const miss = ans.findIndex(a => !a);
-    if (miss !== -1) return alert(`請回答第 ${miss + 1} 題！`);
+async function showResult(qs) {
+  const ans  = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
+  const miss = ans.findIndex(a => !a);
+  if (miss !== -1) return alert(`請回答第 ${miss + 1} 題！`);
 
-    const info = {
-      name : $('name').value,
-      phone: $('phone').value,
-      line : $('lineId').value,
-      bday : $('birthday').value,
-      job  : jobSel.value
-    };
+  const info = {
+    name : $('name').value,
+    phone: $('phone').value,
+    line : $('lineId').value,
+    bday : $('birthday').value,
+    job  : jobSel.value
+  };
 
-    form.innerHTML = '';
-    const box = document.createElement('div');
-    box.className = 'result-container';
-    box.innerHTML = `
-      <h2>📝 您的健檢問卷結果</h2>
-      <p style="background:#fffae6;border:1px solid #f2c94c;padding:10px;
-                text-align:center;font-weight:600;margin-bottom:15px;">
-        請先下載健檢資料，再前往 LINE 諮詢
-      </p>
-      <table style="width:100%;border:1px solid #ddd;font-size:15px">
-        <tr><th style="width:35%">姓名</th><td>${info.name}</td></tr>
-        <tr><th>電話</th><td>${info.phone}</td></tr>
-        <tr><th>Line ID</th><td>${info.line}</td></tr>
-        <tr><th>生日</th><td>${info.bday}</td></tr>
-        <tr><th>職業</th><td>${info.job}</td></tr>
-      </table><br>`;
-    qs.forEach((item, i) => {
-      box.innerHTML += `
-        <div class="qa-card">
-          <div class="question">Q${i + 1}. ${item.q}</div>
-          <div class="answer">👉 ${ans[i].value}</div>
-        </div>`;
-    });
-    form.appendChild(box);
+  form.innerHTML = '';
+  const box = document.createElement('div');
+  box.className = 'result-container';
+  box.innerHTML = `
+    <h2>📝 您的健檢問卷結果</h2>
+    <p style="background:#fffae6;border:1px solid #f2c94c;padding:10px;
+              text-align:center;font-weight:600;margin-bottom:10px;">
+      請先下載健檢資料，再前往 LINE 諮詢
+    </p>
+    <div id="buttonGroup" style="text-align:center; margin-bottom:20px;">
+      <button id="downloadBtn" style="padding:8px 16px; font-size:14px; border-radius:6px;
+              border:1px solid #ccc; background:#fff; cursor:pointer;">下載健檢成果</button>
+      <button id="lineBtn" style="padding:8px 16px; font-size:14px; border-radius:6px;
+              border:1px solid #ccc; background:#06c755; color:white; margin-left:10px;
+              cursor:pointer;">LINE 諮詢</button>
+    </div>
+    <table style="width:100%;border:1px solid #ddd;font-size:15px">
+      <tr><th style="width:35%">姓名</th><td>${info.name}</td></tr>
+      <tr><th>電話</th><td>${info.phone}</td></tr>
+      <tr><th>Line ID</th><td>${info.line}</td></tr>
+      <tr><th>生日</th><td>${info.bday}</td></tr>
+      <tr><th>職業</th><td>${info.job}</td></tr>
+    </table><br>`;
 
-    /* 轉成圖片（Blob URL）*/
-    const canvas = await html2canvas(box, { scale: 2 });
-    const blob   = await new Promise(r => canvas.toBlob(r, 'image/png'));
-    const imgURL = URL.createObjectURL(blob);
+  qs.forEach((item, i) => {
+    box.innerHTML += `
+      <div class="qa-card">
+        <div class="question">Q${i + 1}. ${item.q}</div>
+        <div class="answer">👉 ${ans[i].value}</div>
+      </div>`;
+  });
+  form.appendChild(box);
 
-    /* 下載健檢成果 */
-    const dlBtn = document.createElement('button');
-    dlBtn.type  = 'button';
-    dlBtn.textContent = '下載健檢成果';
-    dlBtn.onclick = () => downloadPNG(imgURL);
+  const canvas = await html2canvas(box, { scale: 2 });
+  const blob   = await new Promise(r => canvas.toBlob(r, 'image/png'));
+  const imgURL = URL.createObjectURL(blob);
 
-    /* LINE 諮詢 */
-    const lineBtn = document.createElement('button');
-    lineBtn.type  = 'button';
-    lineBtn.textContent = 'LINE 諮詢';
-    lineBtn.style.marginLeft = '10px';
-    lineBtn.onclick = openLine;
+  // 綁定按鈕功能
+  document.getElementById('downloadBtn').onclick = () => downloadPNG(imgURL);
+  document.getElementById('lineBtn').onclick = openLine;
 
-    const btnWrap = document.createElement('div');
-    btnWrap.style.marginTop = '20px';
-    btnWrap.append(dlBtn, lineBtn);
-    form.appendChild(btnWrap);
-
-    box.scrollIntoView({ behavior: 'smooth' });
-  }
+  box.scrollIntoView({ behavior: 'smooth' });
+}
 
   /* === 6A. 下載 PNG === */
   function downloadPNG (url) {
