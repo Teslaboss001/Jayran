@@ -82,82 +82,92 @@ document.getElementById("nextBtn").addEventListener("click", () => {
   document.getElementById("questionSection").style.display = "block";
 });
 
-// === 問卷載入 ===
+// === 問卷載入（改為 radio 選擇題版）===
 function loadQuestions() {
   const job = document.getElementById("job").value;
   const form = document.getElementById("questionForm");
   form.innerHTML = "";
 
-  spinQuestions[job].forEach((q, i) => {
+  const qList = spinQuestions[job];       // 取出該職業題目陣列
+
+  qList.forEach((item, i) => {
+    /* 問題文字 */
     const label = document.createElement("label");
-    label.innerText = `${i + 1}. ${q}`;
-    const input = document.createElement("input");
-    input.type = "text";
-    input.name = `q${i}`;
-    input.required = true;
-    input.style.marginTop = "5px";
-    input.style.marginBottom = "12px";
-    input.style.width = "100%";
+    label.innerText = `Q${i + 1}. ${item.q}`;
+    label.style.display = "block";
+    label.style.marginTop = "15px";
     form.appendChild(label);
-    form.appendChild(input);
+
+    /* 產生 radio 選項 */
+    item.options.forEach(opt => {
+      const line = document.createElement("div");
+      line.style.marginLeft = "12px";
+
+      const radio = document.createElement("input");
+      radio.type = "radio";
+      radio.name = `q${i}`;
+      radio.value = opt;
+      radio.required = true;
+
+      const span = document.createElement("span");
+      span.innerText = " " + opt;
+
+      line.appendChild(radio);
+      line.appendChild(span);
+      form.appendChild(line);
+    });
   });
 
+  /* 送出按鈕 */
   const submitBtn = document.createElement("button");
   submitBtn.textContent = "開始評估";
   submitBtn.type = "button";
-  submitBtn.style.marginTop = "20px";
+  submitBtn.style.marginTop = "25px";
 
-  submitBtn.addEventListener("click", function (e) {
-    e.preventDefault();
+  submitBtn.onclick = () => {
+    // 先確認每題都有勾
+    const answers = [];
+    for (let i = 0; i < qList.length; i++) {
+      const sel = form.querySelector(`input[name="q${i}"]:checked`);
+      if (!sel) {
+        alert(`請回答第 ${i + 1} 題`);
+        return;
+      }
+      answers.push(sel.value);
+    }
 
-    // 讀取使用者資料
-    const age = document.getElementById("age").value;
+    /* 讀基本資料 */
+    const age    = document.getElementById("age").value;
     const income = document.getElementById("income").value;
     const saving = document.getElementById("saving").value;
-    const job = document.getElementById("job").value;
-    const answers = [...form.querySelectorAll("input[name^='q']")].map(i => i.value);
 
-    // 清空表單顯示區
+    /* 顯示結果 */
     form.innerHTML = "";
+    const box = document.createElement("div");
+    box.className = "result-container";
 
-    // 結果容器
-    const resultBox = document.createElement("div");
-    resultBox.className = "result-container";
-
-    const header = document.createElement("h2");
-    header.textContent = "📝 您的健檢問卷結果如下";
-    resultBox.appendChild(header);
-
-    // 基本資料顯示
-    const userInfo = document.createElement("p");
-    userInfo.innerHTML = `
-      年齡：${age} 歲<br>
-      平均月收入：${income} 元<br>
-      是否有儲蓄習慣：${saving}<br>
-      職業類別：${job}
+    box.innerHTML = `
+      <h2>📝 您的健檢問卷結果如下</h2>
+      <p>
+        年齡：${age} 歲<br>
+        平均月收入：${income} 元<br>
+        是否有儲蓄習慣：${saving}<br>
+        職業類別：${job}
+      </p>
     `;
-    resultBox.appendChild(userInfo);
 
-    // 顯示每一題問與答
-    spinQuestions[job].forEach((q, i) => {
+    qList.forEach((item, i) => {
       const card = document.createElement("div");
       card.className = "qa-card";
-
-      const qEl = document.createElement("div");
-      qEl.className = "question";
-      qEl.innerHTML = `Q${i + 1}. ${q}`;
-
-      const aEl = document.createElement("div");
-      aEl.className = "answer";
-      aEl.innerHTML = `👉 ${answers[i]}`;
-
-      card.appendChild(qEl);
-      card.appendChild(aEl);
-      resultBox.appendChild(card);
+      card.innerHTML = `
+        <div class="question">Q${i + 1}. ${item.q}</div>
+        <div class="answer">👉 ${answers[i]}</div>
+      `;
+      box.appendChild(card);
     });
 
-    form.appendChild(resultBox);
-  });
+    form.appendChild(box);
+  };
 
   form.appendChild(submitBtn);
-}
+}喔
