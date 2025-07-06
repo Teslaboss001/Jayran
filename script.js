@@ -162,34 +162,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* === 下載 PNG → 加好友 === */
 function downloadAndJump(blobURL) {
-
-  const lineID = "@637zzurf";          // ← 你的官方帳號 ID
-  const noAt   = lineID.slice(1);      // 去掉 @
+  const lineID = "@637zzurf";           // 你的官方帳號
+  const noAt   = lineID.slice(1);
   const ua     = navigator.userAgent;
-  const inLine = /\bLine\//i.test(ua); // LINE 內建瀏覽器
+  const inLine = /\bLine\//i.test(ua);  // 判斷 LINE 內建瀏覽器
 
-  /* ---------- 1. 如果在 LINE 裡：直接跳 https，連下載都省 ---------- */
+  /* ── A. LINE 內建瀏覽器：直接走 https (帶 %40) ── */
   if (inLine) {
-    location.href = `https://line.me/ti/p/${noAt}`;   // 不能帶 @，也不能用 /R/ti/p/
-    return;                                           // 後面程式不執行
+    location.href = `https://line.me/R/ti/p/%40${noAt}`;  // ✅ 官方格式
+    return;  // 不做下載（LINE 內本來就禁止）
   }
 
-  /* ---------- 2. 一般瀏覽器：先下載，再深度連結 ---------- */
-  const a = Object.assign(document.createElement("a"), {
-    href: blobURL,
-    download: "健檢問卷結果.png",
-    style: "display:none"
-  });
+  /* ── B. 外部瀏覽器：先下載，再用深度連結 ── */
+  const a = document.createElement("a");
+  a.href = blobURL;
+  a.download = "健檢問卷結果.png";
+  a.style.display = "none";
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
 
-  /* 用深度連結直接喚醒 LINE，加好友畫面會更快 */
-  const isiOS  = /iPad|iPhone|iPod/.test(ua);
-  const lineURL = isiOS
-      ? `line://ti/p/${noAt}`
-      : `intent://ti/p/${noAt}#Intent;scheme=line;package=jp.naver.line.android;end`;
+  /* 深度連結喚醒 LINE */
+  const isiOS = /iPad|iPhone|iPod/.test(ua);
+  const lineDeep =
+        isiOS ? `line://ti/p/${lineID}`
+              : `intent://ti/p/${noAt}#Intent;scheme=line;package=jp.naver.line.android;end`;
 
-  setTimeout(() => { location.href = lineURL; }, 800);
+  setTimeout(() => { location.href = lineDeep; }, 800);  // 0.8 s 等下載
 }
 });   // -------- DOMContentLoaded END --------
