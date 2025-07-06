@@ -152,46 +152,37 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="answer">👉 ${ans[i].value}</div>
         </div>`;
     });
-
-    const sendBtn = document.createElement("button");
-    sendBtn.type = "button";
-    sendBtn.textContent = "送出並加 Line";
-    sendBtn.style.marginTop = "20px";
-    sendBtn.onclick = () => downloadAndJump(box);
-    box.appendChild(sendBtn);
-
-    form.appendChild(box);
-    box.scrollIntoView({ behavior: "smooth" });
-  }
- = `https://line.me/R/ti/p/${encodeURIComponent(lineID)}`;
+ /* === 下載 PNG → 新分頁；舊分頁回到 Line 好友 === */
+function downloadAndJump(el) {
+  const lineID  = "@637zzurf";                       // ← 保留 @
+  const lineURL = `https://line.me/R/ti/p/${encodeURIComponent(lineID)}`;
   const fileName = "健檢問卷結果.png";
 
-  try {
-    const canvas = await html2canvas(el, { scale: 2 });
-
+  html2canvas(el, { scale: 2 }).then(canvas => {
     canvas.toBlob(blob => {
       const url = URL.createObjectURL(blob);
 
-      /* 1. 建立隱藏下載連結，target="_self" */
+      /* ① 建立「在新分頁」的下載連結 ── target="_blank" */
       const a = Object.assign(document.createElement("a"), {
         href: url,
         download: fileName,
-        target: "_self",
+        target: "_blank",            // <── 關鍵
+        rel: "noopener",
         style: "display:none"
       });
       document.body.appendChild(a);
-      a.click();                                // ① 觸發下載
+      a.click();                     // → 系統瀏覽器跳出並開始下載
       document.body.removeChild(a);
 
-      /* 2. 讓下載請求先送出去，再導到 Line */
+      /* ② 200 ms 後，原分頁 (仍在 Line) 導回好友頁 */
       setTimeout(() => {
-        URL.revokeObjectURL(url);               // 清資源
-        location.href = lineURL;                // ② 同分頁開 Line
-      }, 2000);                                  // 0.2 秒就夠，體感感覺不到
+        URL.revokeObjectURL(url);    // 釋放暫存
+        location.href = lineURL;     // Line 內建瀏覽器改去加好友/聊天室
+      }, 200);                       // 時間可視需要調整
     });
-  } catch (err) {
+  }).catch(err => {
     console.error(err);
     alert("產生圖片失敗，請稍後再試");
-  }
+  });
 }
 });   //  <— 千萬要有！關閉 DOMContentLoaded
