@@ -205,24 +205,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* === 6B. 開啟 LINE 加好友 === */
   function openLine() {
-    const lineID = "@637zzurf";            // 官方帳號
-    const noAt   = lineID.slice(1);
-    const ua     = navigator.userAgent;
-    const inLine = /\bLine\//i.test(ua);
-    const isiOS  = /iPad|iPhone|iPod/.test(ua);
+  const lineID = "@637zzurf";  // ✅ 用半形 @
+  const noAt   = lineID.slice(1);
+  const ua     = navigator.userAgent;
+  const inLine = /\bLine\//i.test(ua);
+  const isiOS  = /iPad|iPhone|iPod/.test(ua);
 
-    /* LINE 內建瀏覽器直接用 https 並帶 %40 */
-    if (inLine) {
-      location.href = `https://line.me/R/ti/p/%40${noAt}`;
-      return;
-    }
-
-    /* 外部瀏覽器 → 深度連結 */
-    const deep =
-      isiOS
-        ? `line://ti/p/${lineID}`
-        : `intent://ti/p/${noAt}#Intent;scheme=line;package=jp.naver.line.android;end`;
-
-    location.href = deep;
+  if (inLine) {
+    location.href = `https://line.me/R/ti/p/%40${noAt}`;
+    return;
   }
+
+  const deep =
+    isiOS
+      ? `line://ti/p/${lineID}`
+      : `intent://ti/p/${noAt}#Intent;scheme=line;package=jp.naver.line.android;end`;
+
+  location.href = deep;
+}
 }); /* -------- DOMContentLoaded END -----   
