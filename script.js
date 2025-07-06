@@ -149,32 +149,46 @@ async function showResult(qs) {
   `;
   box.appendChild(notice);
 
-  // 🔶 建立圖片下載按鈕 & Line 按鈕（預留）
-  const btnWrap = document.createElement("div");
-  btnWrap.style.cssText = "text-align:center; margin-bottom:20px;";
+ // 🔶 建立圖片下載按鈕 & Line 按鈕（修正版）
+const btnWrap = document.createElement("div");
+btnWrap.style.cssText = "text-align:center; margin-bottom:20px;";
 
-  const dlBtn = document.createElement("button");
-  dlBtn.textContent = "下載健檢成果";
-  dlBtn.type = "button";
-  dlBtn.style.cssText = `
-    padding:8px 14px;font-size:14px;
-    background:#fff;border:1px solid #888;
-    border-radius:5px;margin-right:10px;cursor:pointer;
-  `;
+// ✅ 下載按鈕：淺藍底、黑字
+const dlBtn = document.createElement("button");
+dlBtn.textContent = "下載健檢成果";
+dlBtn.type = "button";
+dlBtn.style.cssText = `
+  padding:8px 16px;
+  font-size:15px;
+  background:#e0f0ff;
+  color:#000;
+  border:1px solid #66aadd;
+  border-radius:6px;
+  cursor:pointer;
+`;
 
-  const lineBtn = document.createElement("button");
-  lineBtn.textContent = "LINE 諮詢";
-  lineBtn.type = "button";
-  lineBtn.style.cssText = `
-    padding:8px 14px;font-size:14px;
-    background:#06c755;color:#fff;
-    border:none;border-radius:5px;
-    cursor:pointer;
-  `;
+// ✅ LINE 諮詢按鈕
+const lineBtn = document.createElement("button");
+lineBtn.textContent = "LINE 諮詢";
+lineBtn.type = "button";
+lineBtn.style.cssText = `
+  padding:8px 16px;
+  font-size:15px;
+  background:#06c755;
+  color:#fff;
+  border:none;
+  border-radius:6px;
+  margin-left:10px;
+  cursor:pointer;
+`;
 
-  btnWrap.appendChild(dlBtn);
-  btnWrap.appendChild(lineBtn);
-  box.appendChild(btnWrap);
+// 綁定點擊功能
+dlBtn.onclick = () => downloadPNG(imgURL);
+lineBtn.onclick = () => openLine();
+
+btnWrap.appendChild(dlBtn);
+btnWrap.appendChild(lineBtn);
+box.appendChild(btnWrap);
 
   // 🔶 基本資料表格
   const table = document.createElement("table");
