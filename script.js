@@ -163,33 +163,37 @@ document.addEventListener("DOMContentLoaded", () => {
     form.appendChild(box);
     box.scrollIntoView({ behavior: "smooth" });
   }
- /* === 下載 PNG → 立刻導到 Line（同一分頁）=== */
+ /* === 下載 PNG → 稍候 200 ms 跳 Line（同分頁）=== */
 async function downloadAndJump(el) {
-  const lineID  = "@637zzurf";                // ← 你的 ID，保留 @
+  const lineID  = "@637zzurf";                                 // 你的 ID，保留 @
   const lineURL = `https://line.me/R/ti/p/${encodeURIComponent(lineID)}`;
+  const fileName = "健檢問卷結果.png";
 
   try {
     const canvas = await html2canvas(el, { scale: 2 });
+
     canvas.toBlob(blob => {
-      /* 1. 建立下載連結（target="_self"）*/
       const url = URL.createObjectURL(blob);
-      const a   = Object.assign(document.createElement("a"), {
+
+      /* 1. 建立隱藏下載連結，target="_self" */
+      const a = Object.assign(document.createElement("a"), {
         href: url,
-        download: "健檢問卷結果.png",
+        download: fileName,
         target: "_self",
         style: "display:none"
       });
       document.body.appendChild(a);
-      
-      /* 2. 同一次 click 連續觸發：先下載、再跳轉 */
-      a.click();                      // ① 下載
+      a.click();                                // ① 觸發下載
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      
-      location.href = lineURL;        // ② 同 tab 直接開 Line
+
+      /* 2. 讓下載請求先送出去，再導到 Line */
+      setTimeout(() => {
+        URL.revokeObjectURL(url);               // 清資源
+        location.href = lineURL;                // ② 同分頁開 Line
+      }, 200);                                  // 0.2 秒就夠，體感感覺不到
     });
-  } catch (e) {
-    console.error(e);
+  } catch (err) {
+    console.error(err);
     alert("產生圖片失敗，請稍後再試");
   }
 }
