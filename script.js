@@ -153,19 +153,33 @@ async function showResult(qs) {
 const btnWrap = document.createElement("div");
 btnWrap.style.cssText = "text-align:center; margin-bottom:20px;";
 
-// ✅ 下載按鈕：淺藍底、黑字
-const dlBtn = document.createElement("button");
-dlBtn.textContent = "下載健檢成果";
-dlBtn.type = "button";
-dlBtn.style.cssText = `
-  padding:8px 16px;
-  font-size:15px;
-  background:#e0f0ff;
-  color:#000;
-  border:1px solid #66aadd;
-  border-radius:6px;
-  cursor:pointer;
-`;
+// ✅ 下載按鈕：直接用 <a>，style 做成像按鈕
+-const dlBtn = document.createElement("button");
+-dlBtn.textContent = "下載健檢成果";
+-dlBtn.type = "button";
+-dlBtn.style.cssText = ` …同之前… `;
++const dlBtn = document.createElement("a");
++dlBtn.textContent = "下載健檢成果";
++dlBtn.style.cssText = `
++  display:inline-block;
++  padding:8px 16px;
++  font-size:15px;
++  background:#e0f0ff;
++  color:#000;
++  border:1px solid #66aadd;
++  border-radius:6px;
++  text-decoration:none;
++`;
+
+// 🔶 建立下載圖檔
+const canvas = await html2canvas(box, { scale: 2 });
+const blob   = await new Promise(r => canvas.toBlob(r, "image/png"));
+const imgURL = URL.createObjectURL(blob);
+
+// ✅ 把連結真正指到圖片 & download 名稱，**不用再程式 click()**
+-dlBtn.onclick  = () => downloadPNG(imgURL);
++dlBtn.href     = imgURL;
++dlBtn.download = "健檢問卷結果.png";
 
 // ✅ LINE 諮詢按鈕
 const lineBtn = document.createElement("button");
