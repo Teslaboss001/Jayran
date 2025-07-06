@@ -44,12 +44,12 @@ document.addEventListener("DOMContentLoaded", () => {
   "計程車司機": [
     { q: "大哥您一天大約開幾小時？", options: ["12小時以上", "8到12小時", "少於 8小時"] },
     { q: "開車收入是否波動？", options: ["很穩定", "稍有波動",] },
-    { q: "平均一月可存多少？", options: ["超過2萬", "5000-1萬", "3000-5000"] },
-    { q: "若無法跑車時有其他收入來源嗎？", options: ["部分收入", "完全沒有"] },
-    { q: "淡季／疫情期間載客少時會不會吃緊？", options: ["晚點下班就好", "稍微吃緊"] },
-    { q: "萬一身體不舒服 不能開車幾天，收入中斷會不會影響家用", options: ["稍微影響","完全不影響"] },
-    { q: "有一天車子大修或家人急需用錢時會不會突然有壓力？", options: ["能應付", "稍微擔心"] },
-    { q: "如果有一個方法，每月撥2～5000，就像幫自己準備預備基金，萬一車禍（對方沒保險）身邊還有活錢可以運用，您會不會覺得好加在？", options: ["我不會車禍", "會覺得好險",] },
+    { q: "平均一月可存多少？", options: ["超過2 萬", "5000-1萬", "3000-5000"] },
+    { q: "若無法跑車時有其他收入來源嗎？", options: ["有副業", "部分收入", "完全沒有"] },
+    { q: "淡季／疫情期間載客少時會不會吃緊？", options: ["不緊", "稍緊", "很緊"] },
+    { q: "生病停工幾天會影響家用嗎？", options: ["影響小", "影響中", "影響大"] },
+    { q: "車子大修或家人急需用錢時壓力？", options: ["能應付", "壓力大", "資金短缺"] },
+    { q: "如果有一個方法，每月撥2千，就像幫自己準備 備用基金，萬一爆胎（出狀況）也不會慌，您覺得有沒有幫助？", options: ["有幫助", "可能有用",] },
     { q: "這筆錢還可以當退休補貼，多一份保障，您有興趣了解怎麼操作嗎？", options: ["想了解", "可以考慮",] }
   ],
 
@@ -152,38 +152,41 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="answer">👉 ${ans[i].value}</div>
         </div>`;
     });
- /* === 下載 PNG → 稍候 200 ms 跳 Line（同分頁）=== */
-async function downloadAndJump(el) {
-  const lineID  = "@637zzurf";                                 // 你的 ID，保留 @
-  const lineURL = `https://line.me/R/ti/p/${encodeURIComponent(lineID)}`;
-  const fileName = "健檢問卷結果.png";
 
-  try {
-    const canvas = await html2canvas(el, { scale: 2 });
+    const sendBtn = document.createElement("button");
+    sendBtn.type = "button";
+    sendBtn.textContent = "送出並加 Line";
+    sendBtn.style.marginTop = "20px";
+    sendBtn.onclick = () => downloadAndJump(box);
+    box.appendChild(sendBtn);
 
-    canvas.toBlob(blob => {
-      const url = URL.createObjectURL(blob);
-
-      /* 1. 建立隱藏下載連結，target="_self" */
-      const a = Object.assign(document.createElement("a"), {
-        href: url,
-        download: fileName,
-        target: "_self",
-        style: "display:none"
-      });
-      document.body.appendChild(a);
-      a.click();                                // ① 觸發下載
-      document.body.removeChild(a);
-
-      /* 2. 讓下載請求先送出去，再導到 Line */
-      setTimeout(() => {
-        URL.revokeObjectURL(url);               // 清資源
-        location.href = lineURL;                // ② 同分頁開 Line
-      }, 2000);                                  // 0.2 秒就夠，體感感覺不到
-    });
-  } catch (err) {
-    console.error(err);
-    alert("產生圖片失敗，請稍後再試");
+    form.appendChild(box);
+    box.scrollIntoView({ behavior: "smooth" });
   }
-}
-});   //  <— 千萬要有！關閉 DOMContentLoaded
+
+  /* === 6. 下載 PNG → 跳 Line === */
+  async function downloadAndJump(el) {
+    const lineID = "@637zzurf";                        // 你的官方 ID，保留 @
+    const lineURL = `https://line.me/R/ti/p/${encodeURIComponent(lineID)}`;
+    try {
+      const canvas = await html2canvas(el, { scale: 2 });
+      canvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+
+        const a = Object.assign(document.createElement("a"), {
+          href: url, download: "健檢問卷結果.png", style: "display:none"
+        });
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+
+        setTimeout(() => {
+          URL.revokeObjectURL(url);
+          window.open(lineURL, "_blank");    // ✅ 0.8 秒後開啟 Line 戶
+        }, 800);
+      });
+    } catch (e) {
+      console.error(e);
+      alert("產生圖片失敗，請稍後再試");
+    }
+  }
+
+});   //  <— 千萬要有！關閉 DOMContentLoaded   
