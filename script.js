@@ -154,22 +154,20 @@ const btnWrap = document.createElement("div");
 btnWrap.style.cssText = "text-align:center; margin-bottom:20px;";
 
 // ✅ 下載按鈕：直接用 <a>，style 做成像按鈕
--const dlBtn = document.createElement("button");
--dlBtn.textContent = "下載健檢成果";
--dlBtn.type = "button";
--dlBtn.style.cssText = ` …同之前… `;
-+const dlBtn = document.createElement("a");
-+dlBtn.textContent = "下載健檢成果";
-+dlBtn.style.cssText = `
-+  display:inline-block;
-+  padding:8px 16px;
-+  font-size:15px;
-+  background:#e0f0ff;
-+  color:#000;
-+  border:1px solid #66aadd;
-+  border-radius:6px;
-+  text-decoration:none;
-+`;
+// 建立「下載健檢成果」— 用 <a>
+const dlBtn = document.createElement("a");
+dlBtn.textContent = "下載健檢成果";
+dlBtn.style.cssText = `
+  display:inline-block;
+  padding:8px 16px;
+  font-size:15px;
+  background:#e0f0ff;
+  color:#000;
+  border:1px solid #66aadd;
+  border-radius:6px;
+  text-decoration:none;
+  cursor:pointer;
+`;
 
 // 🔶 建立下載圖檔
 const canvas = await html2canvas(box, { scale: 2 });
