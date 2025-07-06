@@ -2,7 +2,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   /* === 1. 題庫 === */
   const spinQuestions = {
-  "一般上班族": [
+    "一般上班族": [
     { q: "你現在做的這份工作穩定嗎？", options: ["穩定", "偶爾變動", "很不穩定"] },
     { q: "這份工作對你來說壓力大不大？", options: ["正常", "壓力大", "非常疲憊"] },
     { q: "你目前有固定在儲蓄嗎？還是存了就花？", options: ["有固定存","幾乎沒存"] },
@@ -66,31 +66,27 @@ document.addEventListener("DOMContentLoaded", () => {
     { q: "這就像替自己加裝一層額外防護網，平常用不到，但關鍵時刻保護你和家人，你會想深入了解嗎？", options: ["想了解", "再看看",] }
   ]
 };
-  /* === 2. DOM 快捷 === */
+        /* === 2. DOM 快捷 === */
   const $ = id => document.getElementById(id);
   const show = (id, flag) => $(id).style.display = flag ? "block" : "none";
   const form   = $("questionForm");
   const jobSel = $("job");
 
-  /* === 3. 下一步按鈕 === */
+  /* === 3. 下一步 === */
   $("nextBtn").addEventListener("click", () => {
-    const name     = $("name").value.trim();
-    const phone    = $("phone").value.trim();
-    const lineId   = $("lineId").value.trim();
-    const birthday = $("birthday").value;
+    const ok =
+      $("name").value.trim()     &&
+      $("phone").value.trim()    &&
+      $("lineId").value.trim()   &&
+      $("birthday").value;
+    if (!ok) return alert("請完整填寫所有基本資料！");
 
-    if (!name || !phone || !lineId || !birthday) {
-      alert("請完整填寫所有基本資料！");
-      return;
-    }
     show("basicInfoSection", false);
     show("questionSection",  true);
   });
 
-  /* === 4. 變更職業就載入問卷 === */
-  jobSel.addEventListener("change", () => {
-    if (jobSel.value) buildQuestions();
-  });
+  /* === 4. 選職業 → 問卷 === */
+  jobSel.addEventListener("change", () => jobSel.value && buildQuestions());
 
   /* === 5. 動態產生問卷 === */
   function buildQuestions() {
@@ -104,22 +100,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
       item.options.forEach(opt => {
         const wrap  = document.createElement("div");
-        const radio = document.createElement("input");
-        radio.type  = "radio";
-        radio.name  = `q${i}`;
-        radio.value = opt;
-        radio.required = true;
-
-        const span = document.createElement("span");
-        span.textContent = " " + opt;
-
+        const radio = Object.assign(document.createElement("input"), {
+          type: "radio", name: `q${i}`, value: opt, required: true
+        });
         wrap.appendChild(radio);
-        wrap.appendChild(span);
+        wrap.append(" " + opt);
         form.appendChild(wrap);
       });
     });
 
-    /* 送出按鈕 */
     const btn = document.createElement("button");
     btn.type = "button";
     btn.textContent = "開始評估";
@@ -132,8 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* === 6. 顯示結果 === */
   function showResult(qs) {
-    /* 驗證是否都有填 */
-    const ans = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
+    const ans  = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
     const miss = ans.findIndex(a => !a);
     if (miss !== -1) return alert(`請回答第 ${miss + 1} 題！`);
 
@@ -145,11 +133,9 @@ document.addEventListener("DOMContentLoaded", () => {
       job  : jobSel.value
     };
 
-    /* 組結果卡片 */
     form.innerHTML = "";
     const box = document.createElement("div");
     box.className = "result-container";
-
     box.innerHTML = `
       <h2>📝 您的健檢問卷結果</h2>
       <table style="width:100%;border-collapse:collapse;border:1px solid #ddd;font-size:15px">
@@ -180,9 +166,9 @@ document.addEventListener("DOMContentLoaded", () => {
     box.scrollIntoView({ behavior: "smooth" });
   }
 
-  /* === 7. 下載 PNG → 跳轉 Line === */
+  /* === 7. 下載 PNG → 跳 Line === */
   async function downloadAndJump(el) {
-    const lineID = "dvjch";      //  ← ← 改掉!!!
+    const lineID = "dvjch";   // ← 改成你的
     const msg    = encodeURIComponent("您好，我已完成健檢問卷，結果圖已下載，馬上傳給您！");
 
     try {
@@ -190,20 +176,19 @@ document.addEventListener("DOMContentLoaded", () => {
       canvas.toBlob(blob => {
         const url = URL.createObjectURL(blob);
 
-        /* 觸發下載 */
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "健檢問卷結果.png";
-        a.style.display = "none";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        const a = Object.assign(document.createElement("a"), {
+          href: url, download: "健檢問卷結果.png", style: "display:none"
+        });
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
 
-        /* 下載完成後再跳 Line（給 0.8 秒緩衝） */
         setTimeout(() => {
           URL.revokeObjectURL(url);
           window.location.href = `https://line.me/R/ti/p/${lineID}?text=${msg}`;
         }, 800);
       });
-    } catch (err) {
-      alert("產生圖片時發生錯誤，請稍後
+    } catch (e) {
+      console.error(e);
+      alert("產生圖片失敗，請稍後再試");
+    }
+  }
+});
