@@ -1,23 +1,30 @@
-body {
+/* === 基本版面設定 === */
+html, body {
   margin: 0;
   padding: 0;
+  height: 100%;
   font-family: 'Microsoft JhengHei', sans-serif;
   background-image: url('background.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  min-height: 100vh;
+
+  display: flex;
+  align-items: center;      /* 垂直置中 */
+  justify-content: center;  /* 水平置中 */
 }
 
+/* === 最外層卡片容器 === */
 .overlay {
   background-color: rgba(255, 255, 255, 0.9);
+  width: 90%;
   max-width: 500px;
-  margin: 60px auto;
-  padding: 40px;
+  padding: 40px 30px;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
+/* === 標題樣式 === */
 h1, h2 {
   font-size: 24px;
   text-align: center;
@@ -25,6 +32,7 @@ h1, h2 {
   color: #333;
 }
 
+/* === 表單文字與輸入欄位 === */
 label {
   display: block;
   margin-top: 15px;
@@ -42,6 +50,7 @@ input, select {
   font-size: 16px;
 }
 
+/* === 按鈕樣式 === */
 button {
   width: 100%;
   padding: 12px;
@@ -104,7 +113,7 @@ button:hover {
   border-radius: 4px;
 }
 
-/* === SPIN 問卷美化區塊（新增）=== */
+/* === SPIN 問卷選項區塊 === */
 .question-block {
   background: #ffffffcc;
   border: 1px solid #d1d1d1;
@@ -138,7 +147,8 @@ button:hover {
   font-size: 15px;
   color: #444;
 }
-/* === 職業選擇區塊置中美化（新增）=== */
+
+/* === 職業選擇區塊置中美化 === */
 .center-wrapper {
   display: flex;
   flex-direction: column;
