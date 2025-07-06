@@ -15,7 +15,7 @@ const spinQuestions = {
 
   /* ─── 自營業者 ─── */
   "自營業者": [
-    { q: "你目前生意穩定嗎？", options: ["穩定", "偶爾波動",] },
+    { q: "你目前生意穩定嗎？", options: ["穩定", "偶爾波動"] },
     { q: "你覺得當老闆一人多職辛苦嗎？", options: ["可接受", "略辛苦",] },
     { q: "你固定存錢？還是全部投入事業？", options: ["固定存錢", "少量存款", "全部投入"] },
     { q: "老闆沒有勞退，你有自主退休或投資規劃嗎？", options: ["部分有安排", "還沒有想過"] },
@@ -175,7 +175,4 @@ function loadQuestions() {
 document.getElementById("job").addEventListener("change", () => {
   const jobVal = document.getElementById("job").value;
   if (jobVal) loadQuestions();   // 有選到職業 → 載入題目
-});
-document.getElementById("job").addEventListener("change", () => {
-  if (document.getElementById("job").value) loadQuestions();
 });
