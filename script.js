@@ -1,7 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
   const spinQuestions = {
-    // === 各職業問卷題庫 ===
-const spinQuestions = {
   /* ─── 一般上班族 ─── */
   "一般上班族": [
     { q: "你現在做的這份工作穩定嗎？", options: ["穩定", "偶爾變動", "很不穩定"] },
