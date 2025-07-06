@@ -227,16 +227,14 @@ box.appendChild(btnWrap);
   box.scrollIntoView({ behavior: "smooth" });
 }
   /* === 6A. 下載 PNG === */
-  function downloadPNG (url) {
-    const a = Object.assign(document.createElement('a'), {
-      href: url,
-      download: '健檢問卷結果.png',
-      style: 'display:none'
-    });
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  }
+function downloadPNG(blobURL) {
+  const a = document.createElement("a");
+  a.href = blobURL;
+  a.download = "健檢問卷結果.png";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
 
   /* === 6B. 開啟 LINE === */
   function openLine () {
