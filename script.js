@@ -165,22 +165,33 @@ document.addEventListener("DOMContentLoaded", () => {
     form.appendChild(box);
     box.scrollIntoView({ behavior: "smooth" });
   }
+  // === 7. 下載 PNG → 跳 Line ===
+function downloadAndJump(el) {
+  const lineID = "@637zzurf";
+  const msg = encodeURIComponent("您好，我已完成健檢問卷，結果圖已下載，馬上傳給您！");
 
-  /* === 7. 下載 PNG → 跳 Line === */
-          const lineID = "@637zzurf";   // ← 改成你的
-    const msg    = encodeURIComponent("您好，我已完成健檢問卷，結果圖已下載，馬上傳給您！");
-
-    try {
-      const canvas = await html2canvas(el, { scale: 2 });
+  try {
+    html2canvas(el, { scale: 2 }).then(canvas => {
       canvas.toBlob(blob => {
         const url = URL.createObjectURL(blob);
 
         const a = Object.assign(document.createElement("a"), {
-          href: url, download: "健檢問卷結果.png", style: "display:none"
+          href: url,
+          download: "健檢問卷結果.png",
+          style: "display:none"
         });
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
 
         setTimeout(() => {
-  URL.revokeObjectURL(url);
-  window.open("https://line.me/R/ti/p/@637zzurf", "_blank");
-}, 800);
+          URL.revokeObjectURL(url);
+          window.open("https://line.me/R/ti/p/@637zzurf", "_blank");
+        }, 800);
+      });
+    });
+  } catch (e) {
+    console.error(e);
+    alert("產生圖片失敗，請稍後再試");
+  }
+}
