@@ -16,7 +16,7 @@ html, body {
 
 /* === 最外層卡片容器 === */
 .overlay {
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: rgba(255, 255, 255, 0.9);
   width: 90%;
   max-width: 500px;
   padding: 40px 30px;
@@ -115,29 +115,45 @@ button:hover {
   border-radius: 4px;
 }
 
-/* === SPIN 問卷選項區塊（radio樣式） === */
+/* === 問卷表單可捲動設定（關鍵）=== */
 #questionForm {
   margin-top: 25px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 10px;
 }
 
-#questionForm label {
+/* === SPIN 問卷選項區塊（未來可套用 .question-block） === */
+.question-block {
+  background: #ffffffcc;
+  border: 1px solid #d1d1d1;
+  border-radius: 10px;
+  padding: 18px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.question-block label {
+  display: block;
   font-weight: bold;
   font-size: 16px;
   color: #333;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
-#questionForm div {
+.option-line {
+  display: flex;
+  align-items: center;
   margin-bottom: 8px;
   padding-left: 5px;
 }
 
-#questionForm input[type="radio"] {
+.option-line input[type="radio"] {
   margin-right: 8px;
   accent-color: #007bff;
 }
 
-#questionForm span {
+.option-line span {
   font-size: 15px;
   color: #444;
 }
@@ -169,12 +185,4 @@ button:hover {
   font-size: 16px;
   border-radius: 6px;
   border: 1px solid #ccc;
-}
-
-/* === 捲動提示文字（可選加） === */
-.scroll-hint {
-  text-align: center;
-  font-size: 14px;
-  color: #999;
-  margin-top: 15px;
 }
