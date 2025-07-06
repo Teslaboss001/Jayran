@@ -65,139 +65,133 @@ const spinQuestions = {
     { q: "這就像替自己加裝一層額外防護網，平常用不到，但關鍵時刻保護你和家人，你會想深入了解嗎？", options: ["想了解", "再看看",] }
   ]
 };
-/* === 點「下一步」先驗證四個欄位 === */
-document.getElementById("nextBtn").addEventListener("click", () => {
-  const name     = document.getElementById("name").value.trim();
-  const phone    = document.getElementById("phone").value.trim();
-  const lineId   = document.getElementById("lineId").value.trim();
-  const birthday = document.getElementById("birthday").value;
+/* === DOM === */
+  const g  = id => document.getElementById(id);
+  const s  = (id, show) => g(id).style.display = show ? "block" : "none";
+  const form   = g("questionForm");
+  const jobSel = g("job");
 
-  if (!name || !phone || !lineId || !birthday) {
-    alert("請完整填寫所有基本資料！");
-    return;
-  }
-  /* 切換到問卷 */
-  document.getElementById("basicInfoSection").style.display = "none";
-  document.getElementById("questionSection").style.display  = "block";
-});
+  /* === 下一步（驗證四欄） === */
+  g("nextBtn").addEventListener("click", () => {
+    const name = g("name").value.trim();
+    const phone = g("phone").value.trim();
+    const lineId = g("lineId").value.trim();
+    const birthday = g("birthday").value;
+    if (!name || !phone || !lineId || !birthday) {
+      alert("請完整填寫所有基本資料！");
+      return;
+    }
+    s("basicInfoSection", false);
+    s("questionSection",  true);
+  });
 
-/* === 選職業就載入問卷 === */
-document.getElementById("job").addEventListener("change", () => {
-  if (document.getElementById("job").value) loadQuestions();
-});
+  /* === 選職業就載入問卷 === */
+  jobSel.addEventListener("change", () => {
+    if (jobSel.value) loadQuestions();
+  });
 
-/* === 載入問卷（radio 版）=== */
-function loadQuestions() {
-  const job  = document.getElementById("job").value;
-  const form = document.getElementById("questionForm");
-  form.innerHTML = "";
+  /* === 載入問卷 === */
+  function loadQuestions() {
+    const job  = jobSel.value;
+    const qArr = spinQuestions[job];
+    form.innerHTML = "";
 
-  const qList = spinQuestions[job];
-  if (!qList) return;
+    qArr.forEach((item, i) => {
+      const label = document.createElement("label");
+      label.textContent = `Q${i + 1}. ${item.q}`;
+      form.appendChild(label);
 
-  qList.forEach((item, i) => {
-    const label = document.createElement("label");
-    label.textContent = `Q${i + 1}. ${item.q}`;
-    form.appendChild(label);
+      item.options.forEach(opt => {
+        const line  = document.createElement("div");
+        const radio = document.createElement("input");
+        radio.type  = "radio";
+        radio.name  = `q${i}`;
+        radio.value = opt;
+        radio.required = true;
 
-    item.options.forEach(opt => {
-      const line  = document.createElement("div");
+        const span  = document.createElement("span");
+        span.textContent = " " + opt;
 
-      const radio = document.createElement("input");
-      radio.type  = "radio";
-      radio.name  = `q${i}`;
-      radio.value = opt;
-      radio.required = true;
-
-      const span  = document.createElement("span");
-      span.textContent = " " + opt;
-
-      line.appendChild(radio);
-      line.appendChild(span);
-      form.appendChild(line);
+        line.appendChild(radio);
+        line.appendChild(span);
+        form.appendChild(line);
+      });
     });
-  });
 
-  /* 送出按鈕 */
-  const btn = document.createElement("button");
-  btn.textContent = "開始評估";
-  btn.type = "button";
-  btn.style.marginTop = "25px";
-  btn.onclick = () => showResult(qList);
-  form.appendChild(btn);
+    const btn = document.createElement("button");
+    btn.textContent = "開始評估";
+    btn.type = "button";
+    btn.style.marginTop = "25px";
+    btn.onclick = () => showResult(qArr);
+    form.appendChild(btn);
 
-  form.scrollIntoView({ behavior: "smooth" });
-}
+    form.scrollIntoView({ behavior: "smooth" });
+  }
 
-/* === 顯示結果 === */
-function showResult(qList) {
-  const form = document.getElementById("questionForm");
-  const job  = document.getElementById("job").value;
+  /* === 顯示結果 & 送出按鈕 === */
+  function showResult(qArr) {
+    const answers = qArr.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
+    const missIdx = answers.findIndex(a => !a);
+    if (missIdx !== -1) {
+      alert(`請回答第 ${missIdx + 1} 題！`);
+      return;
+    }
 
-  /* 收集答案並檢查 */
-  const answers = qList.map((_, i) =>
-    form.querySelector(`input[name="q${i}"]:checked`));
-  const miss = answers.findIndex(a => !a);
-  if (miss !== -1) return alert(`請回答第 ${miss + 1} 題！`);
+    const name     = g("name").value;
+    const phone    = g("phone").value;
+    const lineId   = g("lineId").value;
+    const birthday = g("birthday").value;
+    const job      = jobSel.value;
 
-  /* 讀基本資料 */
-  const name     = document.getElementById("name").value;
-  const phone    = document.getElementById("phone").value;
-  const lineId   = document.getElementById("lineId").value;
-  const birthday = document.getElementById("birthday").value;
+    form.innerHTML = "";
+    const box = document.createElement("div");
+    box.className = "result-container";
+    box.innerHTML = `
+      <h2>📝 您的健檢問卷結果</h2>
+      <table style="width:100%;border-collapse:collapse;border:1px solid #ddd;font-size:15px">
+        <tr><th style="width:35%">姓名</th><td>${name}</td></tr>
+        <tr><th>電話</th><td>${phone}</td></tr>
+        <tr><th>Line ID</th><td>${lineId}</td></tr>
+        <tr><th>生日</th><td>${birthday}</td></tr>
+        <tr><th>職業</th><td>${job}</td></tr>
+      </table><br>
+    `;
 
-  /* 組結果頁 */
-  form.innerHTML = "";
-  const box = document.createElement("div");
-  box.className = "result-container";
-  box.innerHTML = `
-  <h2>📝 您的健檢問卷結果</h2>
-  <table style="width:100%;border-collapse:collapse;border:1px solid #ddd;font-size:15px">
-    <tr><th style="width:35%">姓名</th><td>${name}</td></tr>
-    <tr><th>電話</th><td>${phone}</td></tr>
-    <tr><th>Line ID</th><td>${lineId}</td></tr>
-    <tr><th>生日</th><td>${birthday}</td></tr>
-    <tr><th>職業</th><td>${job}</td></tr>
-  </table>
-  <br>
-`;
+    qArr.forEach((item, i) => {
+      box.innerHTML += `
+        <div class="qa-card">
+          <div class="question">Q${i + 1}. ${item.q}</div>
+          <div class="answer">👉 ${answers[i].value}</div>
+        </div>`;
+    });
 
-  qList.forEach((item, i) => {
-    box.innerHTML += `
-      <div class="qa-card">
-        <div class="question">Q${i + 1}. ${item.q}</div>
-        <div class="answer">👉 ${answers[i].value}</div>
-      </div>`;
-  });
+    /* === 送出並加 Line 按鈕 === */
+    const sendBtn = document.createElement("button");
+    sendBtn.textContent = "送出並加 Line";
+    sendBtn.style.marginTop = "20px";
+    sendBtn.onclick = () => handleSend(box);
+    box.appendChild(sendBtn);
 
-  form.appendChild(box);
-  box.scrollIntoView({ behavior: "smooth" });
-}
-/* === 送出按鈕 === */
-const sendBtn = document.createElement("button");
-sendBtn.textContent = "送出並加 Line";
-sendBtn.style.marginTop = "20px";
-sendBtn.onclick = handleSend;     // ➜ 綁定下方函式
-box.appendChild(sendBtn);
+    form.appendChild(box);
+    box.scrollIntoView({ behavior: "smooth" });
+  }
 
-async function handleSend() {
-  const box = document.querySelector(".result-container");
-  // 1. 轉成 Canvas
-  const canvas = await html2canvas(box, { scale: 2 });
-  // 2. 轉成 Blob
-  canvas.toBlob(blob => {
-    const url = URL.createObjectURL(blob);
-    // 3. 觸發下載
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "健檢問卷結果.png";
-    a.click();
-    URL.revokeObjectURL(url);
-  });
+  /* === 下載圖檔並跳 Line === */
+  async function handleSend(boxEl) {
+    const lineID = "@dvjch";   // ← 改成你的 Line ID
+    const msg    = encodeURIComponent("您好，我已完成健檢問卷，結果圖已下載，馬上傳給您！");
 
-  // 4. 引導跳 Line（只帶 Line ID，不帶圖片；用戶需手動貼圖）
-  const lineID = "@dvjch";                          // <- 換成你的 ID
-  const msg    = encodeURIComponent("您好，我已完成健檢問卷，結果圖已下載，馬上傳給您！");
-  // 點擊後會打開聊天室；Android 可直接貼文字
-  window.location.href = `https://line.me/R/ti/p/${lineID}?text=${msg}`;
-}
+    const canvas = await html2canvas(boxEl, { scale: 2 });
+    canvas.toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "健檢問卷結果.png";
+      a.click();
+      URL.revokeObjectURL(url);
+
+      window.location.href = `https://line.me/R/ti/p/${lineID}?text=${msg}`;
+    });
+  }
+
+});
