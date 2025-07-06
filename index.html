@@ -1,50 +1,35 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>冠智關心您 - 市調評估</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-</head>
-<body>
-  <div class="overlay">
-    <!-- 第一階段：基本資料 -->
-    <div id="basicInfoSection">
-      <h1>冠智關心您 - 市調評估問卷</h1>
-      <label>年齡：</label>
-      <input type="number" id="age" placeholder="例如 35" required>
+<!-- 第一階段：基本資料 -->
+<div id="basicInfoSection">
+  <h1>冠智關心您 - 市調評估問卷</h1>
+  <label>年齡：</label>
+  <input type="number" id="age" placeholder="例如 35" required>
 
-      <label>平均月收入：</label>
-      <input type="number" id="income" placeholder="例如 60000" required>
+  <label>平均月收入：</label>
+  <input type="number" id="income" placeholder="例如 60000" required>
 
-      <label>是否有儲蓄習慣？</label>
-      <select id="saving" required>
-        <option value="">請選擇</option>
-        <option>是</option>
-        <option>否</option>
-      </select>
-
-      <button id="nextBtn">下一步</button>
-    </div>
-
-    <!-- 第二階段：選職業 + 問卷 -->
-    <div class="center-wrapper">
-  <label for="job">請選擇您的職業類別：</label>
-  <select id="job">
+  <label>是否有儲蓄習慣？</label>
+  <select id="saving" required>
     <option value="">請選擇</option>
-    <option value="一般上班族">一般上班族</option>
-    <option value="自營業者">自營業者</option>
-    <option value="領導主管">領導主管</option>
-    <option value="計程車司機">計程車司機</option>
-    <option value="公職/醫療">公職/醫療</option>
+    <option>是</option>
+    <option>否</option>
   </select>
+
+  <button id="nextBtn">下一步</button>
 </div>
 
-      <form id="questionForm"></form>
-    </div>
+<!-- 第二階段：選職業 + 問卷（初始隱藏）-->
+<div id="questionSection" style="display:none;">
+  <div class="center-wrapper">
+    <label for="job">請選擇您的職業類別：</label>
+    <select id="job">
+      <option value="">請選擇</option>
+      <option value="一般上班族">一般上班族</option>
+      <option value="自營業者">自營業者</option>
+      <option value="領導主管">領導主管</option>
+      <option value="計程車司機">計程車司機</option>
+      <option value="公職/醫療">公職/醫療</option>
+    </select>
   </div>
 
-  <script src="script.js"></script>
-</body>
-</html>
+  <form id="questionForm"></form>
+</div>
