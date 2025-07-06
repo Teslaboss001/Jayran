@@ -65,7 +65,6 @@ const spinQuestions = {
     { q: "這就像替自己加裝一層額外防護網，平常用不到，但關鍵時刻保護你和家人，你會想深入了解嗎？", options: ["想了解", "再看看",] }
   ]
 };
-
 // === 基本資料下一步 ===
 document.getElementById("nextBtn").addEventListener("click", () => {
   const age = document.getElementById("age").value;
@@ -77,28 +76,25 @@ document.getElementById("nextBtn").addEventListener("click", () => {
     return;
   }
 
-  // 隱藏第一階段，顯示第二階段
   document.getElementById("basicInfoSection").style.display = "none";
   document.getElementById("questionSection").style.display = "block";
 });
 
-// === 問卷載入（改為 radio 選擇題版）===
+// === 載入問卷 ===
 function loadQuestions() {
   const job = document.getElementById("job").value;
   const form = document.getElementById("questionForm");
   form.innerHTML = "";
 
-  const qList = spinQuestions[job];       // 取出該職業題目陣列
+  const qList = spinQuestions[job];
 
   qList.forEach((item, i) => {
-    /* 問題文字 */
     const label = document.createElement("label");
     label.innerText = `Q${i + 1}. ${item.q}`;
     label.style.display = "block";
     label.style.marginTop = "15px";
     form.appendChild(label);
 
-    /* 產生 radio 選項 */
     item.options.forEach(opt => {
       const line = document.createElement("div");
       line.style.marginLeft = "12px";
@@ -118,14 +114,12 @@ function loadQuestions() {
     });
   });
 
-  /* 送出按鈕 */
   const submitBtn = document.createElement("button");
   submitBtn.textContent = "開始評估";
   submitBtn.type = "button";
   submitBtn.style.marginTop = "25px";
 
   submitBtn.onclick = () => {
-    // 先確認每題都有勾
     const answers = [];
     for (let i = 0; i < qList.length; i++) {
       const sel = form.querySelector(`input[name="q${i}"]:checked`);
@@ -136,12 +130,10 @@ function loadQuestions() {
       answers.push(sel.value);
     }
 
-    /* 讀基本資料 */
-    const age    = document.getElementById("age").value;
+    const age = document.getElementById("age").value;
     const income = document.getElementById("income").value;
     const saving = document.getElementById("saving").value;
 
-    /* 顯示結果 */
     form.innerHTML = "";
     const box = document.createElement("div");
     box.className = "result-container";
@@ -170,14 +162,11 @@ function loadQuestions() {
   };
 
   form.appendChild(submitBtn);
+  form.scrollIntoView({ behavior: 'smooth' }); // ✅ 滑到問卷區塊
 }
-/* 加在 nextBtn 點擊函式後面，或檔案最底都行 */
+
+// === 選擇職業 → 載入問卷
 document.getElementById("job").addEventListener("change", () => {
   const jobVal = document.getElementById("job").value;
-  if (jobVal) loadQuestions();   // 有選到職業 → 載入題目
+  if (jobVal) loadQuestions();
 });
-  form.appendChild(submit);
-
-  // 顯示問卷表單後，自動滑到該位置
-  form.scrollIntoView({ behavior: 'smooth' });
-}
