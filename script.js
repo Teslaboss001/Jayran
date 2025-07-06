@@ -151,15 +151,16 @@ function showResult(qList) {
   const box = document.createElement("div");
   box.className = "result-container";
   box.innerHTML = `
-    <h2>📝 您的健檢問卷結果如下</h2>
-    <p>
-      姓名：${name}<br>
-      電話：${phone}<br>
-      Line ID：${lineId}<br>
-      生日：${birthday}<br>
-      職業類別：${job}
-    </p>
-  `;
+  <h2>📝 您的健檢問卷結果</h2>
+  <table style="width:100%;border-collapse:collapse;border:1px solid #ddd;font-size:15px">
+    <tr><th style="width:35%">姓名</th><td>${name}</td></tr>
+    <tr><th>電話</th><td>${phone}</td></tr>
+    <tr><th>Line ID</th><td>${lineId}</td></tr>
+    <tr><th>生日</th><td>${birthday}</td></tr>
+    <tr><th>職業</th><td>${job}</td></tr>
+  </table>
+  <br>
+`;
 
   qList.forEach((item, i) => {
     box.innerHTML += `
@@ -171,4 +172,32 @@ function showResult(qList) {
 
   form.appendChild(box);
   box.scrollIntoView({ behavior: "smooth" });
+}
+/* === 送出按鈕 === */
+const sendBtn = document.createElement("button");
+sendBtn.textContent = "送出並加 Line";
+sendBtn.style.marginTop = "20px";
+sendBtn.onclick = handleSend;     // ➜ 綁定下方函式
+box.appendChild(sendBtn);
+
+async function handleSend() {
+  const box = document.querySelector(".result-container");
+  // 1. 轉成 Canvas
+  const canvas = await html2canvas(box, { scale: 2 });
+  // 2. 轉成 Blob
+  canvas.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    // 3. 觸發下載
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "健檢問卷結果.png";
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // 4. 引導跳 Line（只帶 Line ID，不帶圖片；用戶需手動貼圖）
+  const lineID = "@dvjch";                          // <- 換成你的 ID
+  const msg    = encodeURIComponent("您好，我已完成健檢問卷，結果圖已下載，馬上傳給您！");
+  // 點擊後會打開聊天室；Android 可直接貼文字
+  window.location.href = `https://line.me/R/ti/p/${lineID}?text=${msg}`;
 }
