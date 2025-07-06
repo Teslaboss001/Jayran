@@ -182,7 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* === 7. 下載 PNG → 跳轉 Line === */
   async function downloadAndJump(el) {
-    const lineID = "你的 Line ID";      //  ← ← 改掉!!!
+    const lineID = "dvjch";      //  ← ← 改掉!!!
     const msg    = encodeURIComponent("您好，我已完成健檢問卷，結果圖已下載，馬上傳給您！");
 
     try {
