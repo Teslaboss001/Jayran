@@ -216,13 +216,13 @@ box.appendChild(btnWrap);
   form.appendChild(box);
 
   // 🔶 建立下載圖檔
-  const canvas = await html2canvas(box, { scale: 2 });
-  const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
-  const imgURL = URL.createObjectURL(blob);
+const canvas = await html2canvas(box, { scale: 2 });
+const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
+const imgURL = URL.createObjectURL(blob);
 
-  // 🔶 綁定按鈕功能
-  dlBtn.onclick = () => downloadPNG(imgURL);
-  lineBtn.onclick = () => openLine();
+// ✅ 在產生完圖片 URL 後再綁定按鈕
+dlBtn.onclick = () => downloadPNG(imgURL);
+lineBtn.onclick = () => openLine();
 
   box.scrollIntoView({ behavior: "smooth" });
 }
