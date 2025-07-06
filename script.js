@@ -160,26 +160,36 @@ document.addEventListener("DOMContentLoaded", () => {
     box.scrollIntoView({behavior:"smooth"});
   }
 
-  /* === 6. 下載後 0.8s 跳 LINE === */
-  function downloadAndJump(blobURL){
-    const lineID = "@637zzurf";
-    const noAt   = lineID.slice(1);
-    const ua     = navigator.userAgent;
-    const inLine = /Line/i.test(ua) && !/Chrome\/\d+ Mobile/i.test(ua);
-    const isiOS  = /iPad|iPhone|iPod/.test(ua);
+  /* === 下載 PNG → 加好友 === */
+function downloadAndJump(blobURL) {
 
-    const lineURL = inLine
-      ? (isiOS
-          ? `line://ti/p/${noAt}`
-          : `intent://ti/p/${noAt}#Intent;scheme=line;package=jp.naver.line.android;end`)
-      : `https://line.me/R/ti/p/${lineID}`;
+  const lineID = "@637zzurf";          // ← 你的官方帳號 ID
+  const noAt   = lineID.slice(1);      // 去掉 @
+  const ua     = navigator.userAgent;
+  const inLine = /\bLine\//i.test(ua); // LINE 內建瀏覽器
 
-    /* 下載 */
-    const a = Object.assign(document.createElement("a"),{
-      href:blobURL, download:"健檢問卷結果.png", style:"display:none"});
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-
-    setTimeout(()=>{ location.href=lineURL; },800);
+  /* ---------- 1. 如果在 LINE 裡：直接跳 https，連下載都省 ---------- */
+  if (inLine) {
+    location.href = `https://line.me/ti/p/${noAt}`;   // 不能帶 @，也不能用 /R/ti/p/
+    return;                                           // 後面程式不執行
   }
 
+  /* ---------- 2. 一般瀏覽器：先下載，再深度連結 ---------- */
+  const a = Object.assign(document.createElement("a"), {
+    href: blobURL,
+    download: "健檢問卷結果.png",
+    style: "display:none"
+  });
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  /* 用深度連結直接喚醒 LINE，加好友畫面會更快 */
+  const isiOS  = /iPad|iPhone|iPod/.test(ua);
+  const lineURL = isiOS
+      ? `line://ti/p/${noAt}`
+      : `intent://ti/p/${noAt}#Intent;scheme=line;package=jp.naver.line.android;end`;
+
+  setTimeout(() => { location.href = lineURL; }, 800);
+}
 });   // -------- DOMContentLoaded END --------
