@@ -65,38 +65,72 @@ document.addEventListener("DOMContentLoaded", () => {
     { q: "這就像替自己加裝一層額外防護網，平常用不到，但關鍵時刻保護你和家人，你會想深入了解嗎？", options: ["想了解", "再看看",] }
   ]
 };
-       /* (2) DOM 快捷 */
+       /* === 2. DOM 快捷 === */
   const $    = id => document.getElementById(id);
   const show = (id, f) => $(id).style.display = f ? "block" : "none";
-  const form = $("questionForm"), jobSel = $("job");
+  const form = $("questionForm");
+  const jobSel = $("job");
 
-  /* (3) 下一步 */
+  /* === 3. 下一步 === */
   $("nextBtn").addEventListener("click", () => {
     if (!($("name").value.trim() && $("phone").value.trim() &&
           $("lineId").value.trim() && $("birthday").value)) {
-      return alert("請完整填寫所有基本資料！");
+      alert("請完整填寫所有基本資料！");
+      return;
     }
     show("basicInfoSection", false);
     show("questionSection",  true);
   });
 
-  /* (4) 產生問卷（buildQuestions 與題庫同前一版） */
-  jobSel.addEventListener("change", () => jobSel.value && buildQuestions());
-  /* --- buildQuestions() 內容與你上一版相同，略 --- */
+  /* === 4. 選職業 → 動態問卷 === */
+  jobSel.addEventListener("change", () => {
+    if (jobSel.value) buildQuestions();
+  });
 
-  /* (5) showResult 與 (6) downloadAndJump ↓↓↓ 只有這兩段改過 ↓↓↓ */
+  function buildQuestions() {
+    const qs = spinQuestions[jobSel.value] || [];
+    form.innerHTML = "";
 
+    qs.forEach((item, i) => {
+      const label = document.createElement("label");
+      label.textContent = `Q${i + 1}. ${item.q}`;
+      form.appendChild(label);
+
+      item.options.forEach(opt => {
+        const wrap  = document.createElement("div");
+        const radio = Object.assign(document.createElement("input"), {
+          type:"radio", name:`q${i}`, value:opt, required:true
+        });
+        wrap.appendChild(radio);
+        wrap.append(" " + opt);
+        form.appendChild(wrap);
+      });
+    });
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = "開始評估";
+    btn.style.marginTop = "25px";
+    btn.onclick = () => showResult(qs);
+    form.appendChild(btn);
+
+    form.scrollIntoView({behavior:"smooth"});
+  }
+
+  /* === 5. 顯示結果（先轉圖片） === */
   async function showResult(qs) {
-    const ans = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
-    const miss = ans.findIndex(a => !a);
-    if (miss !== -1) return alert(`請回答第 ${miss + 1} 題！`);
+    const ans = qs.map((_,i)=>form.querySelector(`input[name="q${i}"]:checked`));
+    const miss = ans.findIndex(a=>!a);
+    if (miss !== -1) return alert(`請回答第 ${miss+1} 題！`);
 
     const info = { name:$("name").value, phone:$("phone").value,
-                   line:$("lineId").value, bday:$("birthday").value, job:jobSel.value };
+                   line:$("lineId").value, bday:$("birthday").value,
+                   job:jobSel.value };
 
     form.innerHTML = "";
     const box = document.createElement("div");
     box.className = "result-container";
+
     box.innerHTML =
       `<h2>📝 您的健檢問卷結果</h2>
        <table style="width:100%;border:1px solid #ddd;font-size:15px">
@@ -106,26 +140,28 @@ document.addEventListener("DOMContentLoaded", () => {
          <tr><th>生日</th><td>${info.bday}</td></tr>
          <tr><th>職業</th><td>${info.job}</td></tr>
        </table><br>`;
-    qs.forEach((item,i)=>{box.innerHTML+=
-      `<div class="qa-card"><div class="question">Q${i+1}. ${item.q}</div>
-       <div class="answer">👉 ${ans[i].value}</div></div>`});
+    qs.forEach((item,i)=>{
+      box.innerHTML+=
+        `<div class="qa-card"><div class="question">Q${i+1}. ${item.q}</div>
+         <div class="answer">👉 ${ans[i].value}</div></div>`});
     form.appendChild(box);
 
     const canvas = await html2canvas(box,{scale:2});
     const blob   = await new Promise(r=>canvas.toBlob(r,"image/png"));
-    const url    = URL.createObjectURL(blob);
+    const imgURL = URL.createObjectURL(blob);
 
-    const send   = document.createElement("button");
-    send.type="button"; send.textContent="下載並加 LINE";
+    const send = document.createElement("button");
+    send.type="button";
+    send.textContent="下載並加 LINE";
     send.style.marginTop="20px";
-    send.onclick=()=>downloadAndJump(url);
+    send.onclick = () => downloadAndJump(imgURL);
     form.appendChild(send);
 
     box.scrollIntoView({behavior:"smooth"});
   }
 
-  /* 6. 下載 → 延遲 800ms → 深度鏈結 LINE */
-  function downloadAndJump(blobURL) {
+  /* === 6. 下載後 0.8s 跳 LINE === */
+  function downloadAndJump(blobURL){
     const lineID = "@637zzurf";
     const noAt   = lineID.slice(1);
     const ua     = navigator.userAgent;
@@ -136,14 +172,14 @@ document.addEventListener("DOMContentLoaded", () => {
       ? (isiOS
           ? `line://ti/p/${noAt}`
           : `intent://ti/p/${noAt}#Intent;scheme=line;package=jp.naver.line.android;end`)
-      : `https://line.me/R/ti/p/${lineID}`;  // 保留 @，不要 encode
+      : `https://line.me/R/ti/p/${lineID}`;
 
     /* 下載 */
     const a = Object.assign(document.createElement("a"),{
       href:blobURL, download:"健檢問卷結果.png", style:"display:none"});
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
 
-    /* 0.8 秒後再跳 (iOS 需要時間送 download) */
     setTimeout(()=>{ location.href=lineURL; },800);
   }
-});
+
+});   // -------- DOMContentLoaded END --------
