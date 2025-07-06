@@ -1,37 +1,43 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>冠智的市調評估</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <!-- 你的 CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- html2canvas：一定要在 script.js 之前，而且加 defer -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+  <!-- 主要邏輯 -->
+  <script src="script.js" defer></script>
 </head>
+
 <body>
   <div class="overlay">
-
-    <!-- === ① 基本資料區 === -->
+    <!-- === ① 基本資料 === -->
     <div id="basicInfoSection">
-      <h1>冠智關心您 - 健檢問卷</h1>
+      <h1>冠智關心您－健檢問卷</h1>
 
       <label>姓名：</label>
-      <input type="text" id="name" placeholder="例如 王小明" required>
+      <input id="name" type="text" placeholder="例如 王小明" required />
 
       <label>聯絡電話：</label>
-      <input type="tel" id="phone" placeholder="例如 0912345678" required>
+      <input id="phone" type="tel" placeholder="例如 0912345678" required />
 
       <label>Line ID：</label>
-      <input type="text" id="lineId" placeholder="例如 myline123" required>
+      <input id="lineId" type="text" placeholder="例如 myline123" required />
 
       <label>生日：</label>
-      <input type="date" id="birthday" required>
+      <input id="birthday" type="date" required />
 
-      <!-- type="button" 避免提交 -->
+      <!-- button 用 type="button" 才不會送出整頁 -->
       <button id="nextBtn" type="button">下一步</button>
     </div>
 
-    <!-- === ② 職業 + 問卷區（隱藏） === -->
-    <div id="questionSection" style="display:none;">
+    <!-- === ② 職業選擇 + 問卷（先隱藏） === -->
+    <div id="questionSection" style="display:none">
       <div class="center-wrapper">
         <label for="job">請選擇您的職業類別：</label>
         <select id="job">
@@ -40,17 +46,13 @@
           <option value="自營業者">自營業者</option>
           <option value="領導主管">領導主管</option>
           <option value="計程車司機">計程車司機</option>
-          <option value="公職/醫療">公職/醫療</option>
+          <option value="公職/醫療">公職 / 醫療</option>
         </select>
       </div>
 
       <!-- 問卷題目會動態插入這裡 -->
       <form id="questionForm"></form>
     </div>
-
   </div>
-
-  <!-- 最後引用 JavaScript，放在 body 最底部 -->
-  <script src="script.js"></script>
 </body>
 </html>
