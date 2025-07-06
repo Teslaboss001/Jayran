@@ -195,7 +195,7 @@ const spinQuestions = {
     // 等圖片觸發下載後再跳轉 Line
     setTimeout(() => {
       URL.revokeObjectURL(url);
-      window.location.href = `https://line.me/R/ti/p/${dvjch}?text=${msg}`;
+      window.location.href = `https://line.me/R/ti/p/${lineID}?text=${msg}`;
     }, 1000);
   });
 }
