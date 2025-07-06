@@ -167,25 +167,28 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* === 7. 下載 PNG → 跳 Line === */
-async function downloadAndJump(el) {
-  const lineID = "637zzurf";     // ← 拿掉 @
-  const addUrl = `https://line.me/R/ti/p/@${lineID}`;   // 手動加 @
+  async function downloadAndJump(el) {
+    const lineID = "637zzurf";   // ← 改成你的
+    const msg    = encodeURIComponent("您好，我已完成健檢問卷，結果圖已下載，馬上傳給您！");
 
-  /* 先下載截圖 */
-  const canvas = await html2canvas(el, { scale: 2 });
-  canvas.toBlob(blob => {
-    const url = URL.createObjectURL(blob);
-    const a   = document.createElement("a");
-    a.href = url;
-    a.download = "健檢問卷結果.png";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    try {
+      const canvas = await html2canvas(el, { scale: 2 });
+      canvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
 
-    /* 下載完成後跳轉 */
-    setTimeout(() => {
-      URL.revokeObjectURL(url);
-      window.location.href = addUrl;
-    }, 800);
-  });
-}
+        const a = Object.assign(document.createElement("a"), {
+          href: url, download: "健檢問卷結果.png", style: "display:none"
+        });
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+
+        setTimeout(() => {
+          URL.revokeObjectURL(url);
+          window.location.href = `https://line.me/R/ti/p/${lineID}?text=${msg}`;
+        }, 800);
+      });
+    } catch (e) {
+      console.error(e);
+      alert("產生圖片失敗，請稍後再試");
+    }
+  }
+});
