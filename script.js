@@ -176,3 +176,8 @@ document.getElementById("job").addEventListener("change", () => {
   const jobVal = document.getElementById("job").value;
   if (jobVal) loadQuestions();   // 有選到職業 → 載入題目
 });
+  form.appendChild(submit);
+
+  // 顯示問卷表單後，自動滑到該位置
+  form.scrollIntoView({ behavior: 'smooth' });
+}
