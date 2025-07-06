@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
       /* === 2. DOM 快捷 === */
   const $     = id => document.getElementById(id);
   const show  = (id, flag) => $(id).style.display = flag ? "block" : "none";
-  const form  = $("questionForm");
+  const form   = $("questionForm");
   const jobSel = $("job");
 
   /* === 3. 下一步 === */
@@ -79,12 +79,11 @@ document.addEventListener("DOMContentLoaded", () => {
       $("lineId").value.trim() &&
       $("birthday").value;
     if (!ok) return alert("請完整填寫所有基本資料！");
-
     show("basicInfoSection", false);
     show("questionSection",  true);
   });
 
-  /* === 4. 選職業 → 產生問卷 === */
+  /* === 4. 產生問卷 === */
   jobSel.addEventListener("change", () => jobSel.value && buildQuestions());
 
   function buildQuestions() {
@@ -113,31 +112,30 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.style.marginTop = "25px";
     btn.onclick = () => showResult(qs);
     form.appendChild(btn);
+
     form.scrollIntoView({ behavior: "smooth" });
   }
-/* =========  冠智問卷（節錄：開頭題庫、buildQuestions 保留原樣） ========= */
 
-document.addEventListener("DOMContentLoaded", () => {
-
-  /* === … 省略題庫與 buildQuestions() 與前面程式 … === */
-
-  /* === 5. 顯示結果（先把 Canvas 和 Blob-URL 算好） === */
+  /* === 5. 顯示結果 + 預先產生 Canvas === */
   async function showResult(qs) {
-    // === (1) 驗證 ===
-    const ans = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
+    /* 檢查是否答完 */
+    const ans  = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
     const miss = ans.findIndex(a => !a);
     if (miss !== -1) return alert(`請回答第 ${miss + 1} 題！`);
 
-    // === (2) 組結果 HTML ===
+    /* 基本資訊 */
     const info = {
-      name: $("name").value, phone: $("phone").value,
-      line: $("lineId").value, bday: $("birthday").value,
+      name: $("name").value,
+      phone: $("phone").value,
+      line: $("lineId").value,
+      bday: $("birthday").value,
       job : jobSel.value
     };
 
+    /* 組結果卡片 */
     form.innerHTML = "";
-    const box      = document.createElement("div");
-    box.className  = "result-container";
+    const box = document.createElement("div");
+    box.className = "result-container";
     box.innerHTML = `
       <h2>📝 您的健檢問卷結果</h2>
       <table style="width:100%;border:1px solid #ddd;font-size:15px">
@@ -146,8 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <tr><th>Line&nbsp;ID</th><td>${info.line}</td></tr>
         <tr><th>生日</th><td>${info.bday}</td></tr>
         <tr><th>職業</th><td>${info.job}</td></tr>
-      </table><br>
-    `;
+      </table><br>`;
     qs.forEach((item, i) => {
       box.innerHTML += `
         <div class="qa-card">
@@ -157,48 +154,47 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     form.appendChild(box);
 
-    // === (3) 先把 Canvas & Blob-URL 準備好（同步 click 不再跑非同步）===
-    const canvas  = await html2canvas(box, { scale: 2 });
-    const blob    = await new Promise(r => canvas.toBlob(r, "image/png"));
-    const imgURL  = URL.createObjectURL(blob);
+    /* 預先轉成圖片 URL（Blob）*/
+    const canvas = await html2canvas(box, { scale: 2 });
+    const blob   = await new Promise(r => canvas.toBlob(r, "image/png"));
+    const imgURL = URL.createObjectURL(blob);
 
-    // === (4) 送出按鈕 ===
+    /* 送出按鈕 */
     const sendBtn = document.createElement("button");
     sendBtn.type  = "button";
     sendBtn.textContent = "下載並加 LINE";
     sendBtn.style.marginTop = "20px";
-    sendBtn.onclick = () => downloadAndJump(imgURL);   // 只傳 URL
+    sendBtn.onclick = () => downloadAndJump(imgURL);
     form.appendChild(sendBtn);
 
     box.scrollIntoView({ behavior: "smooth" });
   }
 
-  /* === 6. 同步下載 + 跳 LINE === */
+  /* === 6. 同步下載 + 深度連 LINE === */
   function downloadAndJump(blobURL) {
-    const lineID  = "@637zzurf";                         // 你的 ID
-    const noAt    = lineID.replace(/^@/, "");
-    const ua      = navigator.userAgent;
-    const inLine  = /Line/i.test(ua) && !/Chrome\/\d+ Mobile/i.test(ua);
+    const lineID = "@637zzurf";            // 你的官方 ID
+    const noAt   = lineID.slice(1);
+    const ua     = navigator.userAgent;
+    const inLine = /Line/i.test(ua) && !/Chrome\/\d+ Mobile/i.test(ua);
 
-    // 深度連結 (iOS / Android) or https (一般瀏覽器)
     const lineURL = inLine
-      ? (/iPhone|iPad|iPod/.test(ua)
+      ? (/iPad|iPhone|iPod/i.test(ua)
           ? `line://ti/p/${noAt}`
           : `intent://ti/p/${noAt}#Intent;scheme=line;package=jp.naver.line.android;end`)
       : `https://line.me/R/ti/p/${encodeURIComponent(lineID)}`;
 
-    /* --- 1. 下載（同步） --- */
+    /* 1. 下載圖片 */
     const a = Object.assign(document.createElement("a"), {
       href: blobURL,
       download: "健檢問卷結果.png",
       style: "display:none"
     });
     document.body.appendChild(a);
-    a.click();                 // ✅ 下載由同一次 click 直接觸發
+    a.click();
     document.body.removeChild(a);
 
-    /* --- 2. 同步跳 LINE（同分頁；行動才不被擋） --- */
+    /* 2. 跳 LINE（同分頁，行動不被擋） */
     location.href = lineURL;
   }
 
-});  // <— DOMContentLoaded END
+});    // ← DOMContentLoaded END
