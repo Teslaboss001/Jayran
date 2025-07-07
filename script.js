@@ -1,7 +1,8 @@
-/* ==========  冠智問卷  ========== */
-document.addEventListener("DOMContentLoaded", () => {
-  /* === 1. 題庫 === */
-  const spinQuestions = {
+// ★ 最前面不能再有 <script> 標籤 ★
+
+/* ==========  冠智問卷 ========== */
+document.addEventListener('DOMContentLoaded', () => {
+const spinQuestions = {
     "一般上班族": [
     { q: "你現在做的這份工作穩定嗎？", options: ["穩定", "偶爾變動", "很不穩定"] },
     { q: "這份工作對你來說壓力大不大？", options: ["正常", "壓力大", "非常疲憊"] },
@@ -67,55 +68,56 @@ document.addEventListener("DOMContentLoaded", () => {
 };
     <script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
-/* ==========  冠智問卷  ========== */
-document.addEventListener('DOMContentLoaded', () => {
-  /* (1) 題庫：完全照你的原始內容 — 這裡我省略，直接複製即可 ) */
 
-  /* (2) DOM 快捷 */
-  const $ = id => document.getElementById(id);
+  /* === 2. DOM 快捷 === */
+  const $    = id => document.getElementById(id);
   const show = (id, f) => { $(id).style.display = f ? 'block' : 'none'; };
 
   const form   = $('questionForm');
   const jobSel = $('job');
 
-  /* (3) 下一步 */
+  /* === 3. 下一步 === */
   $('nextBtn').addEventListener('click', () => {
-    if (!($('name').value.trim() && $('phone').value.trim()
-        && $('lineId').value.trim() && $('birthday').value)) {
-      alert('請完整填寫所有基本資料！');  return;
+    if (!($('name').value.trim() &&
+          $('phone').value.trim() &&
+          $('lineId').value.trim() &&
+          $('birthday').value)) {
+      alert('請完整填寫所有基本資料！');
+      return;
     }
     show('basicInfoSection', false);
     show('questionSection',  true);
   });
 
-  /* (4) 選職業 → 產生問卷 */
+  /* === 4. 選職業 → 產生問卷 === */
   jobSel.addEventListener('change', () => jobSel.value && buildQuestions());
 
   function buildQuestions () {
     const qs = spinQuestions[jobSel.value] || [];
     form.innerHTML = '';
 
-    qs.forEach((item,i) => {
+    qs.forEach((item, i) => {
       form.insertAdjacentHTML('beforeend', `<label>Q${i+1}. ${item.q}</label>`);
-      item.options.forEach(opt=>{
+      item.options.forEach(opt => {
         form.insertAdjacentHTML('beforeend',
           `<div><input type="radio" name="q${i}" value="${opt}" required> ${opt}</div>`);
       });
     });
+
     const btn = document.createElement('button');
-    btn.textContent = '開始評估'; btn.type='button'; btn.style.marginTop='25px';
+    btn.textContent = '開始評估';
+    btn.type        = 'button';
+    btn.style.marginTop = '25px';
     btn.onclick = () => showResult(qs);
     form.appendChild(btn);
     form.scrollIntoView({behavior:'smooth'});
   }
 
-  /* (5) 顯示結果 */
-  async function showResult (qs){
-    /* 5-1 取答案 */
-    const ans = qs.map((_,i)=>form.querySelector(`input[name="q${i}"]:checked`));
-    const miss= ans.findIndex(a=>!a);
-    if (miss!==-1) return alert(`請回答第 ${miss+1} 題！`);
-
+  /* === 5. 顯示結果 === */
+  async function showResult (qs) {
+    const ans  = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
+    const miss = ans.findIndex(a => !a);
+    if (miss !== -1) return alert(`請回答第 ${miss + 1} 題！`);
     /* 5-2 組版面 */
     form.innerHTML='';
     const box=document.createElement('div'); box.className='result-container';
