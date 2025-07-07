@@ -52,13 +52,23 @@ button:hover{background:#04a94a;}
 .result-container td{
   border:1px solid #ddd;padding:6px 4px;text-align:left;
 }
-.qa-card{
-  background:#f9f9f9;border-radius:6px;
-  padding:6px 8px;margin-top:6px;
+.qa-card {
+  padding: 6px 10px;
+  margin: 6px 0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background: #f9f9f9;
+  font-size: 13px;
+  line-height: 1.4;
 }
-.qa-card .question{font-weight:600}
-.qa-card .answer{margin-top:4px}
-
+.qa-card .question {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.qa-card .answer {
+  font-weight: 400;
+  color: #333;
+}
 /* ---------- 行動裝置微調 ---------- */
 @media(max-width:380px){
   body{padding:10px}
