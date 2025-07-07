@@ -1,0 +1,93 @@
+/* ---------- 全域 ---------- */
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Helvetica,Arial,'Microsoft JhengHei',sans-serif;
+  /* ★ 設定你的背景圖 ↓↓↓ */
+  background:url("bg.jpg") center / cover no-repeat fixed;
+  height:100vh;           /* 讓 flex 垂直置中可生效 */
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* ---------- 主要卡片 ---------- */
+.overlay{
+  width:90%;
+  max-width:420px;
+  background:rgba(255,255,255,.75);  /* 半透明 */
+  backdrop-filter:blur(6px);
+  border-radius:16px;
+  padding:24px 20px 32px;
+  box-shadow:0 4px 18px rgba(0,0,0,.12);
+}
+
+/* 標題 */
+.title{
+  text-align:center;
+  margin-top:0;
+  margin-bottom:20px;
+  letter-spacing:.5px;
+}
+
+/* 表單欄位 */
+input,select,button{
+  width:100%;
+  font-size:15px;
+  padding:10px;
+  margin-top:8px;
+  border:1px solid #ccc;
+  border-radius:6px;
+}
+button{
+  margin-top:18px;
+  background:#06c755;
+  color:#fff;
+  border:none;
+  cursor:pointer;
+  transition:background .2s;
+}
+button:hover{background:#04a94a;}
+
+.field-block{margin-bottom:18px}
+
+/* ---------- 問卷 QA ---------- */
+#questionForm label{
+  display:block;
+  margin-top:14px;
+  font-weight:600;
+}
+
+/* 讓選項有行距 */
+#questionForm div{
+  margin-top:6px;
+}
+
+/* 結果卡片 */
+.result-container{
+  font-size:15px;
+}
+.result-container table{
+  border-collapse:collapse;
+  width:100%;
+}
+.result-container th,
+.result-container td{
+  border:1px solid #ddd;
+  padding:6px 4px;
+  text-align:left;
+}
+.qa-card{
+  background:#f9f9f9;
+  border-radius:6px;
+  padding:6px 8px;
+  margin-top:6px;
+}
+.qa-card .question{font-weight:600}
+.qa-card .answer{margin-top:4px}
+
+/* 行動裝置小優化 */
+@media(max-width:380px){
+  body{padding:10px}
+  .overlay{padding:20px 16px}
+}
