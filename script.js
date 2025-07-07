@@ -65,8 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { q: "這就像替自己加裝一層額外防護網，平常用不到，但關鍵時刻保護你和家人，你會想深入了解嗎？", options: ["想了解", "再看看"] }
   ]
 };
-   
- /* === 2. DOM 快捷 === */
+    /* === 2. DOM 快捷 === */
   const $    = id  => document.getElementById(id);
   const show = (id, flag) => { $(id).style.display = flag ? 'block' : 'none'; };
 
@@ -141,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
       'background:#fffae6;border:1px solid #f2c94c;padding:10px;text-align:center;font-weight:600;margin-bottom:15px;';
     box.appendChild(notice);
 
-    /* --- 基本資料表格 --- */
+    /* 基本資料 */
     const info = {
       name: $('name').value,
       phone:$('phone').value,
@@ -160,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
     box.appendChild(table);
 
-    /* --- 問答卡片 --- */
+    /* 問答卡片 */
     qs.forEach((item, i) => {
       const card = document.createElement('div');
       card.className = 'qa-card';
@@ -170,7 +169,6 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
       box.appendChild(card);
     });
-
     form.appendChild(box);            // 先插入，html2canvas 才抓得到
 
     /* ---------- 生成圖片 ---------- */
@@ -185,13 +183,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const dlBtn = document.createElement('a');
     dlBtn.textContent = '下載健檢成果';
     dlBtn.href     = dataURL;
-    dlBtn.download = '健檢問卷結果.png';   // 支援 a.download 會直接下載
-    dlBtn.target   = '_blank';              // iOS / LINE 會改成新分頁
+    dlBtn.download = '健檢問卷結果.png';     // 有支援 a.download 會直接下載
+    dlBtn.target   = '_blank';                // iOS / LINE 會改成新分頁
     dlBtn.style.cssText = `
       display:inline-block;padding:8px 16px;font-size:15px;
       background:#e0f0ff;color:#000;border:1px solid #66aadd;
       border-radius:6px;text-decoration:none;
     `;
+
+    /* ★ 修正②：LINE WebView / iOS 提示長按下載 ★ */
+    dlBtn.addEventListener('click', () => {
+      const ua = navigator.userAgent;
+      const isLINE = /\bLine\//i.test(ua);
+      const isIOS  = /\(iP(hone|od|ad);/i.test(ua);
+      if (isLINE || isIOS) {
+        setTimeout(() => alert('圖片已在新分頁開啟，請長按圖片 → 儲存'), 300);
+      }
+    });
 
     // LINE
     const lineBtn = document.createElement('button');
@@ -208,14 +216,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* ---------- 捲動 ---------- */
     box.scrollIntoView({ behavior:'smooth' });
-  }
-
-  /* === 6A.（保留給桌機）手動下載 fallback === */
-  function downloadPNG(url){
-    const a = document.createElement('a');
-    a.href = url; a.download = '健檢問卷結果.png';
-    a.style.display='none'; document.body.appendChild(a);
-    a.click(); document.body.removeChild(a);
   }
 
   /* === 6B. 開啟 LINE 加好友 === */
@@ -236,10 +236,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (isAndroid){
       location.href = androidInt;
-      setTimeout(()=>location.href=fallbackHttp,800);
+      /* ★ 修正③：Android 補提示 ★ */
+      setTimeout(()=>{
+        alert('若未自動開啟 LINE，請確認已安裝並允許瀏覽器開啟 App');
+        location.href = fallbackHttp;
+      },800);
       return;
     }
-    window.open(fallbackHttp,'_blank');     // 桌機
+    /* ★ 修正①：桌機多一句提示 ★ */
+    window.open(fallbackHttp,'_blank');
+    alert('請使用 LINE 桌機版或 LINE Web 版登入後，再點擊「加入好友」');
   }
 });
 </script>
