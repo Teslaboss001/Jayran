@@ -65,117 +65,146 @@ document.addEventListener("DOMContentLoaded", () => {
     { q: "這就像替自己加裝一層額外防護網，平常用不到，但關鍵時刻保護你和家人，你會想深入了解嗎？", options: ["想了解", "再看看"] }
   ]
 };
-    <script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script>
+  
 /* ==========  冠智問卷  ========== */
-document.addEventListener('DOMContentLoaded', () => {
-  const spinQuestions = { /* ← 保留你的題庫，這裡省略 */ };
+<!-- html2canvas：仍保留，讓結果畫面先渲染成圖，截圖會更清晰 -->
+<script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-  const $ = id => document.getElementById(id);
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  /* ===== 1. 題庫 ===== */
+  const spinQuestions = { /* ... 你的題庫照貼 ... */ };
+
+  /* ===== 2. DOM 快捷 ===== */
+  const $    = id => document.getElementById(id);
   const show = (id, f) => { $(id).style.display = f ? 'block' : 'none'; };
 
   const form   = $('questionForm');
   const jobSel = $('job');
 
+  /* ===== 3. 基本資料 → 下一步 ===== */
   $('nextBtn').addEventListener('click', () => {
-    if (!($('name').value.trim() && $('phone').value.trim()
-        && $('lineId').value.trim() && $('birthday').value)) {
-      alert('請完整填寫所有基本資料！'); return;
+    if (!($('name').value.trim() && $('phone').value.trim() &&
+          $('lineId').value.trim() && $('birthday').value)) {
+      alert('請完整填寫所有基本資料！');  return;
     }
     show('basicInfoSection', false);
-    show('questionSection', true);
+    show('questionSection',  true);
   });
 
+  /* ===== 4. 選職業 → 產生問卷 ===== */
   jobSel.addEventListener('change', () => jobSel.value && buildQuestions());
 
   function buildQuestions () {
     const qs = spinQuestions[jobSel.value] || [];
     form.innerHTML = '';
+
     qs.forEach((item, i) => {
       form.insertAdjacentHTML('beforeend', `<label>Q${i+1}. ${item.q}</label>`);
       item.options.forEach(opt => {
-        form.insertAdjacentHTML('beforeend',
-          `<div><input type="radio" name="q${i}" value="${opt}" required> ${opt}</div>`);
+        form.insertAdjacentHTML(
+          'beforeend',
+          `<div><input type="radio" name="q${i}" value="${opt}" required> ${opt}</div>`
+        );
       });
     });
+
     const btn = document.createElement('button');
     btn.textContent = '開始評估';
-    btn.type = 'button';
+    btn.type        = 'button';
     btn.style.marginTop = '25px';
     btn.onclick = () => showResult(qs);
     form.appendChild(btn);
-    form.scrollIntoView({ behavior: 'smooth' });
+
+    form.scrollIntoView({ behavior:'smooth' });
   }
 
-  async function showResult(qs) {
-    const ans = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
-    const miss = ans.findIndex(a => !a);
-    if (miss !== -1) return alert(`請回答第 ${miss + 1} 題！`);
+  /* ===== 5. 顯示結果（只剩 LINE 按鈕） ===== */
+  async function showResult (qs) {
 
+    /* 5-1 先檢查是否答完 */
+    const ans  = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
+    const miss = ans.findIndex(a => !a);
+    if (miss !== -1) return alert(`請回答第 ${miss+1} 題！`);
+
+    /* 5-2 建立結果容器 */
     form.innerHTML = '';
+
     const box = document.createElement('div');
     box.className = 'result-container';
+    /* 置中 + 限寬 + 小字體 */
+    box.style.cssText =
+      'max-width:320px;margin:0 auto;font-size:14px;line-height:1.4;text-align:left;';
+
     box.innerHTML = `
-      <p style="background:#fffae6;border:1px solid #f2c94c;
-                padding:10px;text-align:center;font-weight:600;
-                margin-bottom:15px;">
-        請截圖以下健檢資料，並點選下方按鈕前往 LINE 諮詢
+      <p style="background:#fffae6;border:1px solid #f2c94c;padding:10px;font-weight:600;text-align:center;">
+        請截圖健檢結果，<br>再點按下方按鈕前往 LINE 諮詢
       </p>`;
 
+    /* 基本資料 */
     const info = {
       name: $('name').value,
-      phone: $('phone').value,
+      phone:$('phone').value,
       line: $('lineId').value,
       bday: $('birthday').value,
-      job: jobSel.value
+      job : jobSel.value
     };
 
     box.insertAdjacentHTML('beforeend', `
-      <table style="width:100%;border:1px solid #ddd;font-size:15px">
-        <tr><th style="width:35%">姓名</th><td>${info.name}</td></tr>
-        <tr><th>電話</th><td>${info.phone}</td></tr>
-        <tr><th>Line ID</th><td>${info.line}</td></tr>
-        <tr><th>生日</th><td>${info.bday}</td></tr>
-        <tr><th>職業</th><td>${info.job}</td></tr>
+      <table style="width:100%;border:1px solid #ddd;border-collapse:collapse;font-size:13px">
+        <tr><th style="width:35%;border:1px solid #ddd;padding:4px">姓名</th><td style="border:1px solid #ddd;padding:4px">${info.name}</td></tr>
+        <tr><th style="border:1px solid #ddd;padding:4px">電話</th><td style="border:1px solid #ddd;padding:4px">${info.phone}</td></tr>
+        <tr><th style="border:1px solid #ddd;padding:4px">Line ID</th><td style="border:1px solid #ddd;padding:4px">${info.line}</td></tr>
+        <tr><th style="border:1px solid #ddd;padding:4px">生日</th><td style="border:1px solid #ddd;padding:4px">${info.bday}</td></tr>
+        <tr><th style="border:1px solid #ddd;padding:4px">職業</th><td style="border:1px solid #ddd;padding:4px">${info.job}</td></tr>
       </table>`);
 
+    /* 問答卡片 */
     qs.forEach((item, i) => {
       box.insertAdjacentHTML('beforeend', `
-        <div class="qa-card">
-          <div class="question">Q${i+1}. ${item.q}</div>
-          <div class="answer">👉 ${ans[i].value}</div>
+        <div style="margin:6px 0;padding:4px 0;border-bottom:1px dashed #ccc;">
+          <div style="font-weight:600;">Q${i+1}. ${item.q}</div>
+          <div>👉 ${ans[i].value}</div>
         </div>`);
     });
 
     form.appendChild(box);
-    // 產生圖片後，只顯示 LINE 按鈕（鼓勵使用者截圖）
-await html2canvas(box, { scale: 2 });
 
-const btnWrap = document.createElement('div');
-btnWrap.style.cssText = 'text-align:center;margin:20px 0;';
+    /* 5-3 轉成圖片（讓截圖更銳利）── 不顯示、不下載 */
+    await html2canvas(box, { scale:2 });
 
-const addUrl = `https://line.me/R/ti/p/%40637zzurf`;
-const lineA = document.createElement('a');
-lineA.textContent = 'LINE 諮詢';
-lineA.href = addUrl;
-lineA.target = '_blank';
-lineA.style.cssText = `
-  display:inline-block;padding:8px 16px;font-size:15px;
-  background:#06c755;color:#fff;border:none;border-radius:6px;
-  cursor:pointer;text-decoration:none;`;
+    /* 5-4 只留 LINE 按鈕 */
+    const btnWrap = document.createElement('div');
+    btnWrap.style.cssText = 'text-align:center;margin:20px 0;';
 
-lineA.addEventListener('click', e => {
-  const ua = navigator.userAgent;
-  const isIOS = /\(iP(hone|od|ad);/i.test(ua);
-  const isAndroid = /\bAndroid\b/i.test(ua) && !/Windows/i.test(ua);
-  const scheme = `line://ti/p/637zzurf`;
-  if (isIOS || isAndroid) {
-    e.preventDefault();
-    location.href = scheme;
-    setTimeout(() => location.href = addUrl, 800);
+    const addUrl = 'https://line.me/R/ti/p/%40637zzurf';
+    const lineA  = document.createElement('a');
+    lineA.textContent = 'LINE 諮詢';
+    lineA.href   = addUrl;
+    lineA.target = '_blank';
+    lineA.style.cssText =
+      'display:inline-block;padding:10px 18px;font-size:15px;' +
+      'background:#06c755;color:#fff;border-radius:6px;' +
+      'text-decoration:none;font-weight:600;';
+
+    /* 手機再試 URI-scheme */
+    lineA.addEventListener('click', e => {
+      const ua        = navigator.userAgent;
+      const isIOS     = /\(iP(hone|od|ad);/i.test(ua);
+      const isAndroid = /\bAndroid\b/i.test(ua) && !/Windows/i.test(ua);
+      if (isIOS || isAndroid) {
+        e.preventDefault();
+        location.href = 'line://ti/p/637zzurf';
+        setTimeout(() => location.href = addUrl, 800);
+      }
+    });
+
+    btnWrap.appendChild(lineA);
+    box.appendChild(btnWrap);
+
+    box.scrollIntoView({ behavior:'smooth' });
   }
-});
 
-btnWrap.append(lineA);
-box.insertBefore(btnWrap, box.children[1]);
-box.scrollIntoView({ behavior: 'smooth' });
+});
+</script>
