@@ -4,7 +4,7 @@ body{
   margin:0;
   font-family:system-ui,-apple-system,Helvetica,Arial,'Microsoft JhengHei',sans-serif;
   /* ★ 換成自己的背景圖 ↓↓↓ */
-  background:url("bg.jpg") center/cover no-repeat fixed;
+  background:url("background.jpg") center/cover no-repeat fixed;
   min-height:100vh;
   display:flex;
   justify-content:center;
