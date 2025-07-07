@@ -102,46 +102,39 @@ document.addEventListener('DOMContentLoaded', () => {
     btnWrap.style.cssText = 'text-align:center;margin:20px 0;';
     const isLINE = /\bLine\//i.test(navigator.userAgent);
     const downloadHref = isLINE ? 'javascript:void(0)' : dataURL;
+/* 下載 (用 <a>) */
+const dl = document.createElement('a');
+dl.textContent = '下載健檢成果';
+dl.style.cssText = `
+  display:inline-block;padding:8px 16px;font-size:15px;
+  background:#e0f0ff;color:#000;border:1px solid #66aadd;
+  border-radius:6px;text-decoration:none;`;
 
-    const dl = document.createElement('a');
-    dl.textContent = '下載健檢成果';
-    dl.href = downloadHref;
-    dl.download = '健檢問卷結果.png';
-    dl.target = isLINE ? '_self' : '_blank';
-    dl.style.cssText = `
-      display:inline-block;padding:8px 16px;font-size:15px;
-      background:#e0f0ff;color:#000;border:1px solid #66aadd;
-      border-radius:6px;text-decoration:none;`;
-    dl.addEventListener('click', () => {
-      if (isLINE) {
-        location.href = dataURL;
-        alert('長按圖片 → 儲存到相簿');
-      }
-    });
+const ua      = navigator.userAgent;
+const isLINE  = /\bLine\//i.test(ua);
+const isIOS   = /\(iP(hone|od|ad);/i.test(ua);
 
-    const addUrl = `https://line.me/R/ti/p/%40637zzurf`;
-    const lineA = document.createElement('a');
-    lineA.textContent = 'LINE 諮詢';
-    lineA.href = addUrl;
-    lineA.target = '_blank';
-    lineA.style.cssText = `
-      display:inline-block;padding:8px 16px;font-size:15px;
-      background:#06c755;color:#fff;border:none;border-radius:6px;
-      margin-left:10px;cursor:pointer;text-decoration:none;`;
-    lineA.addEventListener('click', e => {
-      const ua = navigator.userAgent;
-      const isIOS = /\(iP(hone|od|ad);/i.test(ua);
-      const isAndroid = /\bAndroid\b/i.test(ua) && !/Windows/i.test(ua);
-      const scheme = `line://ti/p/637zzurf`;
-      if (isIOS || isAndroid) {
-        e.preventDefault();
-        location.href = scheme;
-        setTimeout(() => location.href = addUrl, 800);
-      }
-    });
-
-    btnWrap.append(dl, lineA);
-    box.insertBefore(btnWrap, box.children[1]);
-    box.scrollIntoView({ behavior: 'smooth' });
-  }
-});
+/* 👉 桌機／一般瀏覽器 ── 直接下載 */
+if (!isLINE && !isIOS) {
+  dl.href     = dataURL;
+  dl.download = '健檢問卷結果.png';
+  dl.target   = '_blank';
+}
+/* 👉 LINE WebView 或 iOS Safari ── 另外開圖頁 */
+else {
+  dl.href = 'javascript:void(0)';
+  dl.addEventListener('click', () => {
+    const w = window.open('', '_blank');          // 開子視窗
+    if (!w) {                                     // 被擋 → 給提示
+      alert('瀏覽器阻擋了新視窗，請用 Safari／Chrome 開啟再試一次！');
+      return;
+    }
+    /* 只塞一張圖，讓使用者長按儲存 */
+    w.document.write(`
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>長按圖片下載</title>
+      <p style="text-align:center;font-weight:600">⏬ 長按以下圖片 → 儲存 ⏬</p>
+      <img src="${dataURL}" style="width:100%;max-width:600px;display:block;margin:0 auto">
+    `);
+  });
+}
