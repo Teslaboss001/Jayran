@@ -258,20 +258,20 @@ function openLine () {
   const lineID = '@637zzurf';
   const noAt   = lineID.slice(1);
   const ua     = navigator.userAgent;
-  const isiOS  = /iPad|iPhone|iPod/.test(ua);
-  const isAndroid = /Android/i.test(ua) && !/Windows/i.test(ua);
 
-  // 1️⃣ 手機（已安裝 LINE）→ 使用 scheme / intent 直接喚醒
-  if (isiOS) {
+  const isiOS      = /iPad|iPhone|iPod/.test(ua);        // iPhone／iPad
+  // 要同時帶有 Android 和 Mobile 才算手機，排除桌機 Chrome 的「模擬」UA
+  const isAndroid  = /Android/i.test(ua) && /Mobile/i.test(ua);
+
+  if (isiOS) {                         // iOS 直接用 scheme
     location.href = `line://ti/p/${noAt}`;
     return;
   }
-  if (isAndroid) {
+  if (isAndroid) {                     // Android 才送 intent://
     location.href = `intent://ti/p/${noAt}#Intent;scheme=line;package=jp.naver.line.android;end`;
     return;
   }
-
-  // 2️⃣ 桌面環境 → fallback 到官方 https 加好友頁
+  // 走到這裡就是桌面瀏覽器，改用官方 https 加好友頁
   location.href = `https://line.me/R/ti/p/%40${noAt}`;
 }
 }); /* -------- DOMContentLoaded END -------- */
