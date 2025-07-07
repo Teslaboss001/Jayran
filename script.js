@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { q: "這就像替自己加裝一層額外防護網，平常用不到，但關鍵時刻保護你和家人，你會想深入了解嗎？", options: ["想了解", "再看看"] }
   ]
 };
-    /* === 2. DOM 快捷 === */
+     /* === 2. DOM 快捷 === */
   const $    = id  => document.getElementById(id);
   const show = (id, flag) => { $(id).style.display = flag ? 'block' : 'none'; };
 
