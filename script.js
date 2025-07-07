@@ -178,7 +178,9 @@ async function showResult (qs) {
     }
   });
 
-  btnWrap.append(lineA);
+    btnWrap.append(lineA);
   box.insertBefore(btnWrap, box.children[1]);
   box.scrollIntoView({ behavior: 'smooth' });
-}
+}  // ← 關掉 showResult
+
+}); // ← 關掉 DOMContentLoaded 事件監聽器
