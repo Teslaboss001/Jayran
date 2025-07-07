@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>冠智的市調評估</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     body {
       font-family: sans-serif;
@@ -33,16 +34,13 @@
       font-size: 14px;
       border-radius: 6px;
     }
-    .question {
-      font-weight: 600;
-    }
-    .answer {
-      margin-top: 4px;
-    }
+    .question { font-weight: 600; }
+    .answer { margin-top: 4px; }
   </style>
 </head>
 <body>
   <div class="overlay">
+    <!-- 基本資料 -->
     <div id="basicInfoSection">
       <h2>冠智關心您－健檢問卷</h2>
       <label>姓名：</label>
@@ -56,6 +54,7 @@
       <button id="nextBtn" type="button">下一步</button>
     </div>
 
+    <!-- 問卷部分 -->
     <div id="questionSection" style="display:none">
       <div id="jobSection">
         <label>請選擇您的職業類別：</label>
@@ -72,75 +71,59 @@
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const spinQuestions = {
         "一般上班族": [
           { q: "你現在做的這份工作穩定嗎？", options: ["穩定", "偶爾變動", "很不穩定"] },
-          { q: "這份工作對你來說壓力大不大？", options: ["正常", "壓力大", "非常疲憊"] }
-        ],
-        "自營業者": [
-          { q: "你目前生意穩定嗎？", options: ["穩定", "偶爾波動"] },
-          { q: "你固定存錢？還是全部投入事業？", options: ["固定存錢", "全部投入"] }
-        ],
-        "領導主管": [
-          { q: "你目前團隊工作量是否滿檔？", options: ["非常忙碌", "偶爾加班", "時間彈性"] },
-          { q: "你現在有固定安排資產儲蓄嗎？", options: ["有", "部分", "沒有"] }
-        ],
-        "計程車司機": [
-          { q: "您一天大約開幾小時？", options: ["12小時以上", "8到12小時", "少於8小時"] },
-          { q: "開車收入是否波動？", options: ["很穩定", "稍有波動"] }
-        ],
-        "公職/醫療": [
-          { q: "你目前在單位服務習慣嗎？", options: ["還行", "不太習慣"] },
-          { q: "你有另外儲蓄或投資嗎？", options: ["有", "沒有"] }
+          { q: "這份工作對你來說壓力大不大？", options: ["正常", "壓力大", "非常疲憊"] },
+          { q: "你目前有固定在儲蓄嗎？", options: ["有固定存","幾乎沒存"] },
+          { q: "公司有提撥勞退，你還有另外規劃退休金嗎？", options: ["有額外規劃", "想規劃但還沒做", "沒有規劃"] },
+          { q: "若突發大筆支出，你覺得夠用嗎？", options: ["可能夠", "完全沒有準備"] }
         ]
       };
 
       const $ = id => document.getElementById(id);
-      const show = (id, visible) => { $(id).style.display = visible ? 'block' : 'none'; };
+      const show = (id, f) => { $(id).style.display = f ? 'block' : 'none'; };
 
       $('nextBtn').addEventListener('click', () => {
         if (!($('name').value && $('phone').value && $('lineId').value && $('birthday').value)) {
-          alert("請完整填寫所有基本資料！");
+          alert('請完整填寫所有基本資料！');
           return;
         }
         show('basicInfoSection', false);
         show('questionSection', true);
       });
 
-      $('job').addEventListener('change', () => {
-        if ($('job').value) buildQuestions();
-      });
+      $('job').addEventListener('change', () => buildQuestions());
 
-      function buildQuestions() {
-        const qs = spinQuestions[$('job').value] || [];
+      function buildQuestions () {
+        const job = $('job').value;
+        const qs = spinQuestions[job] || [];
         const form = $('questionForm');
         form.innerHTML = '';
-
         qs.forEach((item, i) => {
           form.insertAdjacentHTML('beforeend', `<label>Q${i+1}. ${item.q}</label>`);
           item.options.forEach(opt => {
-            form.insertAdjacentHTML('beforeend',
-              `<div><input type="radio" name="q${i}" value="${opt}" required> ${opt}</div>`);
+            form.insertAdjacentHTML('beforeend', `
+              <div><input type="radio" name="q${i}" value="${opt}" required> ${opt}</div>
+            `);
           });
         });
 
         const btn = document.createElement('button');
-        btn.type = 'button';
         btn.textContent = '開始評估';
-        btn.style.marginTop = '20px';
+        btn.type = 'button';
+        btn.style.marginTop = '25px';
         btn.onclick = () => showResult(qs);
         form.appendChild(btn);
-        form.scrollIntoView({ behavior: 'smooth' });
       }
 
       async function showResult(qs) {
         const form = $('questionForm');
         const ans = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
         const miss = ans.findIndex(a => !a);
-        if (miss !== -1) return alert(`請回答第 ${miss+1} 題！`);
+        if (miss !== -1) return alert(`請回答第 ${miss + 1} 題！`);
 
         $('jobSection').style.display = 'none';
         form.innerHTML = '';
@@ -150,7 +133,6 @@
         box.style.maxWidth = '340px';
         box.style.margin = '0 auto';
 
-        // 黃色提示
         box.innerHTML = `
           <p style="background:#fffae6;border:1px solid #f2c94c;
                     padding:10px;text-align:center;font-weight:600;
@@ -158,22 +140,14 @@
             請自行截圖此評估結果，傳送至 LINE 諮詢
           </p>`;
 
-        const info = {
-          name: $('name').value,
-          phone: $('phone').value,
-          line: $('lineId').value,
-          bday: $('birthday').value,
-          job: $('job').value
-        };
-
-        box.insertAdjacentHTML('beforeend', `
+        box.innerHTML += `
           <table style="width:100%;border:1px solid #ddd;font-size:15px">
-            <tr><th style="width:35%">姓名</th><td>${info.name}</td></tr>
-            <tr><th>電話</th><td>${info.phone}</td></tr>
-            <tr><th>Line ID</th><td>${info.line}</td></tr>
-            <tr><th>生日</th><td>${info.bday}</td></tr>
-            <tr><th>職業</th><td>${info.job}</td></tr>
-          </table>`);
+            <tr><th style="width:35%">姓名</th><td>${$('name').value}</td></tr>
+            <tr><th>電話</th><td>${$('phone').value}</td></tr>
+            <tr><th>Line ID</th><td>${$('lineId').value}</td></tr>
+            <tr><th>生日</th><td>${$('birthday').value}</td></tr>
+            <tr><th>職業</th><td>${$('job').value}</td></tr>
+          </table>`;
 
         qs.forEach((item, i) => {
           box.insertAdjacentHTML('beforeend', `
@@ -184,12 +158,11 @@
         });
 
         form.appendChild(box);
-        await html2canvas(box, { scale: 2 });
 
         const btnWrap = document.createElement('div');
         btnWrap.style.cssText = 'text-align:center;margin:20px 0;';
-
         const addUrl = `https://line.me/R/ti/p/%40637zzurf`;
+
         const lineA = document.createElement('a');
         lineA.textContent = 'LINE 諮詢';
         lineA.href = addUrl;
@@ -212,8 +185,11 @@
         });
 
         btnWrap.appendChild(lineA);
-        box.insertBefore(btnWrap, box.children[1]);
+        box.appendChild(btnWrap);
         box.scrollIntoView({ behavior: 'smooth' });
+
+        // 等待畫面穩定後再截圖（使用者可手動截圖）
+        await html2canvas(box, { scale: 2 });
       }
     });
   </script>
