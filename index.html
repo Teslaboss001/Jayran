@@ -2,38 +2,37 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>冠智的市調評估</title>
 
   <!-- 全站樣式 -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- html2canvas：一定要在 script.js 之前 -->
+  <!-- html2canvas：要在 script.js 之前，並加 defer -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
   <!-- 主要邏輯 -->
   <script src="script.js" defer></script>
 </head>
 
 <body>
-  <!-- ★ 背景圖請自己在 style.css 的 body 設定 url ★ -->
+  <!-- ★ 背景圖請自行在 style.css 的 body 設定 url() ★ -->
 
-  <!-- =================== 主要介面 =================== -->
   <div class="overlay">
     <!-- ① 基本資料 -->
     <div id="basicInfoSection">
       <h2 class="title">冠智關心您－健檢問卷</h2>
 
-      <label>姓名：</label>
-      <input id="name" type="text" placeholder="例如 王小明" />
+      <label>姓名</label>
+      <input id="name" type="text" placeholder="例如 王小明" required />
 
-      <label>聯絡電話：</label>
-      <input id="phone" type="tel" placeholder="例如 0912345678" />
+      <label>聯絡電話</label>
+      <input id="phone" type="tel" placeholder="例如 0912345678" required />
 
-      <label>Line ID：</label>
-      <input id="lineId" type="text" placeholder="例如 myline123" />
+      <label>Line ID</label>
+      <input id="lineId" type="text" placeholder="例如 myline123" required />
 
-      <label>生日：</label>
-      <input id="birthday" type="date" />
+      <label>生日</label>
+      <input id="birthday" type="date" required />
 
       <button id="nextBtn" type="button">下一步</button>
     </div>
@@ -41,8 +40,8 @@
     <!-- ② 職業選擇 + 問卷 -->
     <div id="questionSection" style="display:none">
       <div id="jobSection" class="field-block">
-        <label>請選擇您的職業類別：</label>
-        <select id="job">
+        <label>請選擇您的職業類別</label>
+        <select id="job" required>
           <option value="">請選擇</option>
           <option value="一般上班族">一般上班族</option>
           <option value="自營業者">自營業者</option>
@@ -52,7 +51,7 @@
         </select>
       </div>
 
-      <!-- 問卷題目會動態插入 -->
+      <!-- 問卷題目動態插入 -->
       <form id="questionForm"></form>
     </div>
   </div>
