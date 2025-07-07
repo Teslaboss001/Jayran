@@ -122,82 +122,72 @@ document.addEventListener("DOMContentLoaded", () => {
     form.scrollIntoView({ behavior: 'smooth' });
   }
 
-  /* === 5. 顯示結果（含提示、下載、LINE 按鈕） === */
-async function showResult(qs) {
-  const ans = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
-  const miss = ans.findIndex(a => !a);
-  if (miss !== -1) return alert(`請回答第 ${miss + 1} 題！`);
+/* === 5. 顯示結果（含提示、下載、LINE 按鈕） === */
+async function showResult (qs) {
+  /* -------(前面驗證 & 基本資料 省略，和你原來一樣)------- */
 
-  const info = {
-    name: $("name").value,
-    phone: $("phone").value,
-    line: $("lineId").value,
-    bday: $("birthday").value,
-    job: jobSel.value
-  };
+  /* ---------- 1. 先把結果 BOX 組好 ---------- */
+  form.innerHTML = '';
+  const box = document.createElement('div');
+  box.className = 'result-container';
 
-  form.innerHTML = "";
-  const box = document.createElement("div");
-  box.className = "result-container";
-
-  // 🔶 提示文字
-  const notice = document.createElement("p");
-  notice.innerHTML = "請先下載健檢資料，再前往 LINE 諮詢";
-  notice.style.cssText = `
-    background:#fffae6;border:1px solid #f2c94c;padding:10px;
-    text-align:center;font-weight:600;margin-bottom:15px;
-  `;
+  const notice = document.createElement('p');
+  notice.textContent = '請先下載健檢資料，再前往 LINE 諮詢';
+  notice.style.cssText =
+    'background:#fffae6;border:1px solid #f2c94c;padding:10px;text-align:center;font-weight:600;margin-bottom:15px;';
   box.appendChild(notice);
 
- // 🔶 建立圖片下載按鈕 & Line 按鈕（修正版）
-const btnWrap = document.createElement("div");
-btnWrap.style.cssText = "text-align:center; margin-bottom:20px;";
+  /*  基本資料表、問答區 …… 這裡照你原本 append 即可  */
 
-// ✅ 下載按鈕：淺藍底、黑字
-// 先把 box 做完以後 ↓↓↓
-const canvas  = await html2canvas(box, { scale: 2 });
-const blob    = await new Promise(r => canvas.toBlob(r, 'image/png'));
-const imgURL  = URL.createObjectURL(blob);
+  form.appendChild(box);        // 先插進 DOM，才能讓 html2canvas 抓得到內容
 
-// 再來才建 <a>
-const dlBtn = document.createElement('a');
-dlBtn.textContent = '下載健檢成果';
-dlBtn.href        = imgURL;
-dlBtn.download    = '健檢問卷結果.png';
-dlBtn.target      = '_blank';
-dlBtn.style.cssText = `
-  display:inline-block;
-  padding:8px 16px;
-  font-size:15px;
-  background:#e0f0ff;
-  color:#000;
-  border:1px solid #66aadd;
-  border-radius:6px;
-  text-decoration:none;
-`;
+  /* ---------- 2. 用 html2canvas 生成圖片（一次就好） ---------- */
+  const canvas   = await html2canvas(box, { scale: 2 });
+  const dataURL  = canvas.toDataURL('image/png');   // ← 用 dataURL，不用 blob
 
-// 把「連結」真正指到圖片
-dlBtn.href     = imgURL;                     // 所有環境都用得到
-dlBtn.download = '健檢問卷結果.png';         // 桌機 / Android-Chrome 會直接下載
-dlBtn.target   = '_blank';                   // iOS Safari、LINE 會開新分頁
-// 👇 只要這兩行就行了
-dlBtn.href     = imgURL;                  // 指向圖片
-dlBtn.download = '健檢問卷結果.png';      // 有支援的瀏覽器會直接下載
+  /* ---------- 3. 建立下載／Line 按鈕 ---------- */
+  const btnWrap = document.createElement('div');
+  btnWrap.style.cssText = 'text-align:center;margin:20px 0;';
 
-// ✅ LINE 諮詢按鈕
-const lineBtn = document.createElement("button");
-lineBtn.textContent = "LINE 諮詢";
-lineBtn.type = "button";
-lineBtn.style.cssText = `
-  padding:8px 16px;
-  font-size:15px;
-  background:#06c755;
-  color:#fff;
-  border:none;
-  border-radius:6px;
-  margin-left:10px;
-  cursor:pointer;
-`;
+  // ▍下載健檢成果（<a> 直接指向 dataURL）
+  const dlBtn = document.createElement('a');
+  dlBtn.textContent = '下載健檢成果';
+  dlBtn.href        = dataURL;                      // 所有環境共用
+  dlBtn.download    = '健檢問卷結果.png';          // 桌機、Android-Chrome 直接下載
+  dlBtn.target      = '_blank';                    // iOS / LINE 會開新分頁
+  dlBtn.style.cssText = `
+    display:inline-block;
+    padding:8px 16px;
+    font-size:15px;
+    background:#e0f0ff;
+    color:#000;
+    border:1px solid #66aadd;
+    border-radius:6px;
+    text-decoration:none;
+  `;
+
+  // ▍LINE 諮詢按鈕
+  const lineBtn = document.createElement('button');
+  lineBtn.textContent = 'LINE 諮詢';
+  lineBtn.type  = 'button';
+  lineBtn.onclick = openLine;                      // 直接綁 openLine
+  lineBtn.style.cssText = `
+    padding:8px 16px;
+    font-size:15px;
+    background:#06c755;
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    margin-left:10px;
+    cursor:pointer;
+  `;
+
+  btnWrap.append(dlBtn, lineBtn);
+  box.insertBefore(btnWrap, box.firstChild.nextSibling); // 放在提示文字下方
+
+  /* ---------- 4. 捲動到結果 ---------- */
+  box.scrollIntoView({ behavior: 'smooth' });
+}
 
 // 綁定點擊功能
 dlBtn.onclick = () => downloadPNG(imgURL);
@@ -232,17 +222,6 @@ box.appendChild(btnWrap);
 
   form.appendChild(box);
 
-  // 🔶 建立下載圖檔
-  const canvas = await html2canvas(box, { scale: 2 });
-  const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
-  const imgURL = URL.createObjectURL(blob);
-
-  // 🔶 綁定按鈕功能
-  dlBtn.onclick = () => downloadPNG(imgURL);
-  lineBtn.onclick = () => openLine();
-
-  box.scrollIntoView({ behavior: "smooth" });
-}
   /* === 6A. 下載 PNG === */
 function downloadPNG(url) {
   const ua    = navigator.userAgent;
