@@ -148,35 +148,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     form.appendChild(box);
-    await html2canvas(box, { scale: 2 });  // 照樣轉圖片，讓用戶能截圖或備用
+    // 產生圖片後，只顯示 LINE 按鈕（鼓勵使用者截圖）
+await html2canvas(box, { scale: 2 });
 
-    const btnWrap = document.createElement('div');
-    btnWrap.style.cssText = 'text-align:center;margin:20px 0;';
+const btnWrap = document.createElement('div');
+btnWrap.style.cssText = 'text-align:center;margin:20px 0;';
 
-    const addUrl = `https://line.me/R/ti/p/%40637zzurf`;
-    const lineA = document.createElement('a');
-    lineA.textContent = 'LINE 諮詢';
-    lineA.href = addUrl;
-    lineA.target = '_blank';
-    lineA.style.cssText = `
-      display:inline-block;padding:8px 16px;font-size:15px;
-      background:#06c755;color:#fff;border:none;border-radius:6px;
-      cursor:pointer;text-decoration:none;`;
+const addUrl = `https://line.me/R/ti/p/%40637zzurf`;
+const lineA = document.createElement('a');
+lineA.textContent = 'LINE 諮詢';
+lineA.href = addUrl;
+lineA.target = '_blank';
+lineA.style.cssText = `
+  display:inline-block;padding:8px 16px;font-size:15px;
+  background:#06c755;color:#fff;border:none;border-radius:6px;
+  cursor:pointer;text-decoration:none;`;
 
-    lineA.addEventListener('click', e => {
-      const ua = navigator.userAgent;
-      const isIOS = /\(iP(hone|od|ad);/i.test(ua);
-      const isAndroid = /\bAndroid\b/i.test(ua) && !/Windows/i.test(ua);
-      const scheme = `line://ti/p/637zzurf`;
-      if (isIOS || isAndroid) {
-        e.preventDefault();
-        location.href = scheme;
-        setTimeout(() => location.href = addUrl, 800);
-      }
-    });
-
-    btnWrap.append(lineA);
-    box.insertBefore(btnWrap, box.children[1]);
-    box.scrollIntoView({ behavior: 'smooth' });
+lineA.addEventListener('click', e => {
+  const ua = navigator.userAgent;
+  const isIOS = /\(iP(hone|od|ad);/i.test(ua);
+  const isAndroid = /\bAndroid\b/i.test(ua) && !/Windows/i.test(ua);
+  const scheme = `line://ti/p/637zzurf`;
+  if (isIOS || isAndroid) {
+    e.preventDefault();
+    location.href = scheme;
+    setTimeout(() => location.href = addUrl, 800);
   }
 });
+
+btnWrap.append(lineA);
+box.insertBefore(btnWrap, box.children[1]);
+box.scrollIntoView({ behavior: 'smooth' });
