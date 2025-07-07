@@ -215,37 +215,11 @@ async function showResult(qs) {
   box.scrollIntoView({ behavior: "smooth" });
 }
 // 綁定點擊功能
-dlBtn.onclick = () => downloadPNG(imgURL);
 lineBtn.onclick = () => openLine();
 
 btnWrap.appendChild(dlBtn);
 btnWrap.appendChild(lineBtn);
 box.appendChild(btnWrap);
-
-  // 🔶 基本資料表格
-  const table = document.createElement("table");
-  table.style.cssText = "width:100%;border:1px solid #ddd;font-size:15px";
-  table.innerHTML = `
-    <tr><th style="width:35%">姓名</th><td>${info.name}</td></tr>
-    <tr><th>電話</th><td>${info.phone}</td></tr>
-    <tr><th>Line ID</th><td>${info.line}</td></tr>
-    <tr><th>生日</th><td>${info.bday}</td></tr>
-    <tr><th>職業</th><td>${info.job}</td></tr>
-  `;
-  box.appendChild(table);
-
-  // 🔶 問答區
-  qs.forEach((item, i) => {
-    const qaCard = document.createElement("div");
-    qaCard.className = "qa-card";
-    qaCard.innerHTML = `
-      <div class="question">Q${i + 1}. ${item.q}</div>
-      <div class="answer">👉 ${ans[i].value}</div>
-    `;
-    box.appendChild(qaCard);
-  });
-
-  form.appendChild(box);
 
   /* === 6A. 下載 PNG === */
 function downloadPNG(url) {
