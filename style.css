@@ -74,3 +74,10 @@ button:hover{background:#04a94a;}
   body{padding:10px}
   .overlay{padding:20px 16px}
 }
+.result-container table {
+  font-size: 12px;
+}
+.result-container th,
+.result-container td {
+  padding: 4px 6px;
+}
