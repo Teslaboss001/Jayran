@@ -1,8 +1,6 @@
-// ★ 最前面不能再有 <script> 標籤 ★
-
-/* ==========  冠智問卷 ========== */
+// ★ script.js 檔案，這裡是正確版本開頭
 document.addEventListener('DOMContentLoaded', () => {
-const spinQuestions = {
+  const spinQuestions = {
     "一般上班族": [
     { q: "你現在做的這份工作穩定嗎？", options: ["穩定", "偶爾變動", "很不穩定"] },
     { q: "這份工作對你來說壓力大不大？", options: ["正常", "壓力大", "非常疲憊"] },
@@ -70,9 +68,10 @@ const spinQuestions = {
 <script>
 
   /* === 2. DOM 快捷 === */
-  const $    = id => document.getElementById(id);
-  const show = (id, f) => { $(id).style.display = f ? 'block' : 'none'; };
+  };
 
+  const $ = id => document.getElementById(id);
+  const show = (id, f) => { $(id).style.display = f ? 'block' : 'none'; };
   const form   = $('questionForm');
   const jobSel = $('job');
 
