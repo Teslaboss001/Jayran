@@ -259,7 +259,7 @@ function openLine () {
   const noAt   = lineID.slice(1);
   const ua     = navigator.userAgent;
   const isiOS  = /iPad|iPhone|iPod/.test(ua);
-  const isAndroid = /Android/i.test(ua);
+  const isAndroid = /Android/i.test(ua) && !/Windows/i.test(ua);
 
   // 1️⃣ 手機（已安裝 LINE）→ 使用 scheme / intent 直接喚醒
   if (isiOS) {
