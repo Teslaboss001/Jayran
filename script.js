@@ -199,4 +199,3 @@ document.addEventListener('DOMContentLoaded', () => {
     box.scrollIntoView({behavior:'smooth'});
   }
 });
-</script>
