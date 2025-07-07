@@ -243,4 +243,3 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 </script>
-}); /* -------- DOMContentLoaded END -------- */
