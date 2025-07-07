@@ -227,30 +227,51 @@ box.appendChild(btnWrap);
   box.scrollIntoView({ behavior: "smooth" });
 }
   /* === 6A. 下載 PNG === */
-function downloadPNG(blobURL) {
-  const a = document.createElement("a");
-  a.href = blobURL;
-  a.download = "健檢問卷結果.png";
+function downloadPNG(url) {
+  const ua    = navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua);
+  const isLINE = /\bLine\//i.test(ua);
+
+  // 1️⃣ iOS Safari 或 LINE WebView：用新分頁 + 手動長按儲存
+  if (isIOS || isLINE) {
+    const win = window.open(url, '_blank');
+    if (!win) {
+      alert("瀏覽器阻擋了新視窗，請在 Safari／Chrome 開啟本頁再試一次！");
+    } else {
+      alert("請長按開啟的圖片，選擇『加入相片』或『下載』");
+    }
+    return;
+  }
+
+  // 2️⃣ 其他瀏覽器：正常 a.download 觸發
+  const a = document.createElement('a');
+  a.href      = url;
+  a.download  = '健檢問卷結果.png';
+  a.style.display = 'none';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
 }
 
-  /* === 6B. 開啟 LINE === */
-  function openLine () {
-    const lineID = '@637zzurf';
-    const noAt   = lineID.slice(1);
-    const ua     = navigator.userAgent;
-    const inLine = /Line\//i.test(ua);
-    const isiOS  = /iPad|iPhone|iPod/.test(ua);
+/* === 6B. 開啟 LINE 加好友 === */
+function openLine () {
+  const lineID = '@637zzurf';
+  const noAt   = lineID.slice(1);
+  const ua     = navigator.userAgent;
+  const isiOS  = /iPad|iPhone|iPod/.test(ua);
+  const isAndroid = /Android/i.test(ua);
 
-    if (inLine) {
-      location.href = `https://line.me/R/ti/p/%40${noAt}`;
-      return;
-    }
-    const deep = isiOS
-      ? `line://ti/p/${noAt}`
-      : `intent://ti/p/${noAt}#Intent;scheme=line;package=jp.naver.line.android;end`;
-    location.href = deep;
+  // 1️⃣ 手機（已安裝 LINE）→ 使用 scheme / intent 直接喚醒
+  if (isiOS) {
+    location.href = `line://ti/p/${noAt}`;
+    return;
   }
+  if (isAndroid) {
+    location.href = `intent://ti/p/${noAt}#Intent;scheme=line;package=jp.naver.line.android;end`;
+    return;
+  }
+
+  // 2️⃣ 桌面環境 → fallback 到官方 https 加好友頁
+  location.href = `https://line.me/R/ti/p/%40${noAt}`;
+}
 }); /* -------- DOMContentLoaded END -------- */
