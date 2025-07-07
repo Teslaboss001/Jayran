@@ -122,39 +122,67 @@ document.addEventListener("DOMContentLoaded", () => {
     form.scrollIntoView({ behavior: 'smooth' });
   }
 
-/* === 5. 顯示結果（含提示、下載、LINE 按鈕） === */
-async function showResult (qs) {
-  /* -------(前面驗證 & 基本資料 省略，和你原來一樣)------- */
+/* === 5. 顯示結果（含提示、下載、LINE 
+async function showResult(qs) {
+  // ...驗證略
 
-  /* ---------- 1. 先把結果 BOX 組好 ---------- */
-  form.innerHTML = '';
-  const box = document.createElement('div');
-  box.className = 'result-container';
+  const info = {
+    name: $("name").value,
+    phone: $("phone").value,
+    line: $("lineId").value,
+    bday: $("birthday").value,
+    job: jobSel.value
+  };
 
-  const notice = document.createElement('p');
-  notice.textContent = '請先下載健檢資料，再前往 LINE 諮詢';
-  notice.style.cssText =
-    'background:#fffae6;border:1px solid #f2c94c;padding:10px;text-align:center;font-weight:600;margin-bottom:15px;';
+  form.innerHTML = "";
+  const box = document.createElement("div");
+  box.className = "result-container";
+
+  // 提示文字
+  const notice = document.createElement("p");
+  notice.textContent = "請先下載健檢資料，再前往 LINE 諮詢";
+  notice.style.cssText = "background:#fffae6;border:1px solid #f2c94c;padding:10px;text-align:center;font-weight:600;margin-bottom:15px;";
   box.appendChild(notice);
 
-  /*  基本資料表、問答區 …… 這裡照你原本 append 即可  */
+  // 基本資料表格
+  const table = document.createElement("table");
+  table.style.cssText = "width:100%;border:1px solid #ddd;font-size:15px";
+  table.innerHTML = `
+    <tr><th style="width:35%">姓名</th><td>${info.name}</td></tr>
+    <tr><th>電話</th><td>${info.phone}</td></tr>
+    <tr><th>Line ID</th><td>${info.line}</td></tr>
+    <tr><th>生日</th><td>${info.bday}</td></tr>
+    <tr><th>職業</th><td>${info.job}</td></tr>
+  `;
+  box.appendChild(table);
 
-  form.appendChild(box);        // 先插進 DOM，才能讓 html2canvas 抓得到內容
+  // 問答卡片
+  const ans = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
+  qs.forEach((item, i) => {
+    const qaCard = document.createElement("div");
+    qaCard.className = "qa-card";
+    qaCard.innerHTML = `
+      <div class="question">Q${i + 1}. ${item.q}</div>
+      <div class="answer">👉 ${ans[i].value}</div>
+    `;
+    box.appendChild(qaCard);
+  });
 
-  /* ---------- 2. 用 html2canvas 生成圖片（一次就好） ---------- */
-  const canvas   = await html2canvas(box, { scale: 2 });
-  const dataURL  = canvas.toDataURL('image/png');   // ← 用 dataURL，不用 blob
+  form.appendChild(box);
 
-  /* ---------- 3. 建立下載／Line 按鈕 ---------- */
-  const btnWrap = document.createElement('div');
-  btnWrap.style.cssText = 'text-align:center;margin:20px 0;';
+  // 圖片轉圖
+  const canvas = await html2canvas(box, { scale: 2 });
+  const dataURL = canvas.toDataURL("image/png");
 
-  // ▍下載健檢成果（<a> 直接指向 dataURL）
-  const dlBtn = document.createElement('a');
-  dlBtn.textContent = '下載健檢成果';
-  dlBtn.href        = dataURL;                      // 所有環境共用
-  dlBtn.download    = '健檢問卷結果.png';          // 桌機、Android-Chrome 直接下載
-  dlBtn.target      = '_blank';                    // iOS / LINE 會開新分頁
+  // 按鈕區
+  const btnWrap = document.createElement("div");
+  btnWrap.style.cssText = "text-align:center;margin:20px 0;";
+
+  const dlBtn = document.createElement("a");
+  dlBtn.textContent = "下載健檢成果";
+  dlBtn.href = dataURL;
+  dlBtn.download = "健檢問卷結果.png";
+  dlBtn.target = "_blank";
   dlBtn.style.cssText = `
     display:inline-block;
     padding:8px 16px;
@@ -166,11 +194,10 @@ async function showResult (qs) {
     text-decoration:none;
   `;
 
-  // ▍LINE 諮詢按鈕
-  const lineBtn = document.createElement('button');
-  lineBtn.textContent = 'LINE 諮詢';
-  lineBtn.type  = 'button';
-  lineBtn.onclick = openLine;                      // 直接綁 openLine
+  const lineBtn = document.createElement("button");
+  lineBtn.textContent = "LINE 諮詢";
+  lineBtn.type = "button";
+  lineBtn.onclick = openLine;
   lineBtn.style.cssText = `
     padding:8px 16px;
     font-size:15px;
@@ -183,12 +210,10 @@ async function showResult (qs) {
   `;
 
   btnWrap.append(dlBtn, lineBtn);
-  box.insertBefore(btnWrap, box.firstChild.nextSibling); // 放在提示文字下方
+  box.insertBefore(btnWrap, box.firstChild.nextSibling);
 
-  /* ---------- 4. 捲動到結果 ---------- */
-  box.scrollIntoView({ behavior: 'smooth' });
+  box.scrollIntoView({ behavior: "smooth" });
 }
-
 // 綁定點擊功能
 dlBtn.onclick = () => downloadPNG(imgURL);
 lineBtn.onclick = () => openLine();
