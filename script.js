@@ -70,7 +70,6 @@ document.addEventListener("DOMContentLoaded", () => {
 /* ==========  冠智問卷  ========== */
 document.addEventListener('DOMContentLoaded', () => {
   /* (1) 題庫：完全照你的原始內容 — 這裡我省略，直接複製即可 ) */
-  const spinQuestions = { /* … */ };
 
   /* (2) DOM 快捷 */
   const $ = id => document.getElementById(id);
