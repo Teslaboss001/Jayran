@@ -154,9 +154,17 @@ const btnWrap = document.createElement("div");
 btnWrap.style.cssText = "text-align:center; margin-bottom:20px;";
 
 // ✅ 下載按鈕：淺藍底、黑字
-// ===== 1. 先建立 <a>，只有外觀 =====
+// 先把 box 做完以後 ↓↓↓
+const canvas  = await html2canvas(box, { scale: 2 });
+const blob    = await new Promise(r => canvas.toBlob(r, 'image/png'));
+const imgURL  = URL.createObjectURL(blob);
+
+// 再來才建 <a>
 const dlBtn = document.createElement('a');
 dlBtn.textContent = '下載健檢成果';
+dlBtn.href        = imgURL;
+dlBtn.download    = '健檢問卷結果.png';
+dlBtn.target      = '_blank';
 dlBtn.style.cssText = `
   display:inline-block;
   padding:8px 16px;
@@ -167,13 +175,6 @@ dlBtn.style.cssText = `
   border-radius:6px;
   text-decoration:none;
 `;
-
-// …中間先把 box、table 都塞好…
-
-// ===== 2. 做出圖片，再把屬性補進 dlBtn =====
-const canvas  = await html2canvas(box, { scale: 2 });
-const blob    = await new Promise(r => canvas.toBlob(r, 'image/png'));
-const imgURL  = URL.createObjectURL(blob);
 
 // 把「連結」真正指到圖片
 dlBtn.href     = imgURL;                     // 所有環境都用得到
