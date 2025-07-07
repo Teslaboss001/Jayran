@@ -66,31 +66,22 @@ document.addEventListener("DOMContentLoaded", () => {
   ]
 };
   
-/* =========  冠智問卷邏輯  ========= */
-document.addEventListener('DOMContentLoaded', () => {
-
-  /* === 1. 題庫（照原本貼） === */
-  const spinQuestions = { /* ...你的題庫... */ };
-
-  /* === 2. DOM 快捷 === */
-  const $ = id => document.getElementById(id);
+const $ = id => document.getElementById(id);
   const show = (id, f) => { $(id).style.display = f ? 'block' : 'none'; };
 
-  const form       = $('questionForm');
-  const jobSel     = $('job');
+  const form   = $('questionForm');
+  const jobSel = $('job');
 
-  /* === 3. 下一步：檢查基本資料 → 顯示職業選單 === */
   $('nextBtn').addEventListener('click', () => {
-    if (!($('name').value.trim() && $('phone').value.trim()
-        && $('lineId').value.trim() && $('birthday').value)) {
+    if (!($('name').value.trim() && $('phone').value.trim() &&
+          $('lineId').value.trim() && $('birthday').value)) {
       alert('請完整填寫所有基本資料！');
       return;
     }
-    show('basicInfoSection', false);   // 隱藏基本資料
-    show('questionSection',  true);    // 顯示職業 + 問卷
+    show('basicInfoSection', false);
+    show('questionSection', true);
   });
 
-  /* === 4. 選職業 → 產生問卷 === */
   jobSel.addEventListener('change', () => jobSel.value && buildQuestions());
 
   function buildQuestions () {
@@ -99,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     qs.forEach((item, i) => {
       form.insertAdjacentHTML('beforeend', `<label>Q${i+1}. ${item.q}</label>`);
-      item.options.forEach(opt=>{
+      item.options.forEach(opt => {
         form.insertAdjacentHTML('beforeend',
           `<div><input type="radio" name="q${i}" value="${opt}" required> ${opt}</div>`);
       });
@@ -111,24 +102,25 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.style.marginTop = '25px';
     btn.onclick = () => showResult(qs);
     form.appendChild(btn);
-
-    form.scrollIntoView({behavior:'smooth'});
+    form.scrollIntoView({ behavior: 'smooth' });
   }
 
-  /* === 5. 顯示結果（只有 LINE 按鈕） === */
-  async function showResult (qs){
-    /* 5-1 取答案 */
-    const ans  = qs.map((_,i)=>form.querySelector(`input[name="q${i}"]:checked`));
-    const miss = ans.findIndex(a=>!a);
-    if (miss !== -1) return alert(`請回答第 ${miss+1} 題！`);
+  async function showResult(qs) {
+    const ans = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
+    const miss = ans.findIndex(a => !a);
+    if (miss !== -1) return alert(`請回答第 ${miss + 1} 題！`);
 
-    /* 5-2 隱藏職業下拉區塊 */
-    show('jobSection', false);
+    // ✅ 隱藏職業選單
+    const jobSection = document.getElementById('jobSection');
+    if (jobSection) jobSection.style.display = 'none';
 
-    /* 5-3 組結果版面 */
     form.innerHTML = '';
     const box = document.createElement('div');
-    box.className = 'result-container center-wrapper';   // 置中 + 限寬
+    box.className = 'result-container';
+    box.style.maxWidth = '340px';
+    box.style.margin = '0 auto';
+
+    // ✅ 更新文字：請自行截圖...
     box.innerHTML = `
       <p style="background:#fffae6;border:1px solid #f2c94c;
                 padding:10px;text-align:center;font-weight:600;
@@ -137,11 +129,14 @@ document.addEventListener('DOMContentLoaded', () => {
       </p>`;
 
     const info = {
-      name:$('name').value, phone:$('phone').value,
-      line:$('lineId').value, bday:$('birthday').value,
-      job :jobSel.value
+      name: $('name').value,
+      phone: $('phone').value,
+      line: $('lineId').value,
+      bday: $('birthday').value,
+      job: jobSel.value
     };
-    box.insertAdjacentHTML('beforeend',`
+
+    box.insertAdjacentHTML('beforeend', `
       <table style="width:100%;border:1px solid #ddd;font-size:15px">
         <tr><th style="width:35%">姓名</th><td>${info.name}</td></tr>
         <tr><th>電話</th><td>${info.phone}</td></tr>
@@ -150,46 +145,45 @@ document.addEventListener('DOMContentLoaded', () => {
         <tr><th>職業</th><td>${info.job}</td></tr>
       </table>`);
 
-    qs.forEach((item,i)=>{
-      box.insertAdjacentHTML('beforeend',`
-        <div class="qa-card">
-          <div class="question">Q${i+1}. ${item.q}</div>
+    qs.forEach((item, i) => {
+      box.insertAdjacentHTML('beforeend', `
+        <div class="qa-card" style="background:#f9f9f9;padding:6px 8px;margin-top:6px;font-size:14px;">
+          <div class="question">Q${i + 1}. ${item.q}</div>
           <div class="answer">👉 ${ans[i].value}</div>
         </div>`);
     });
+
     form.appendChild(box);
+    await html2canvas(box, { scale: 2 });
 
-    /* 5-4 產生 canvas（僅為確保排版，使用者手動截圖即可）*/
-    await html2canvas(box,{scale:1});
-
-    /* 5-5 只留 LINE 按鈕 */
+    // ✅ 移除淺藍色「下載健檢結果」按鈕，僅保留 LINE 諮詢
     const btnWrap = document.createElement('div');
-    btnWrap.style.cssText='text-align:center;margin:20px 0;';
-    const addUrl = 'https://line.me/R/ti/p/%40637zzurf';
+    btnWrap.style.cssText = 'text-align:center;margin:20px 0;';
 
-    const lineBtn = document.createElement('a');
-    lineBtn.textContent = 'LINE 諮詢';
-    lineBtn.href   = addUrl;
-    lineBtn.target = '_blank';
-    lineBtn.style.cssText=`
+    const addUrl = `https://line.me/R/ti/p/%40637zzurf`;
+    const lineA = document.createElement('a');
+    lineA.textContent = 'LINE 諮詢';
+    lineA.href = addUrl;
+    lineA.target = '_blank';
+    lineA.style.cssText = `
       display:inline-block;padding:8px 16px;font-size:15px;
       background:#06c755;color:#fff;border:none;border-radius:6px;
       cursor:pointer;text-decoration:none;`;
 
-    /* 手機先嘗試叫醒 LINE */
-    lineBtn.addEventListener('click', e=>{
-      const ua=navigator.userAgent;
-      const isiOS=/\(iP(hone|od|ad);/i.test(ua);
-      const isAndroid=/\bAndroid\b/i.test(ua)&&!/Windows/i.test(ua);
-      if(isiOS||isAndroid){
+    lineA.addEventListener('click', e => {
+      const ua = navigator.userAgent;
+      const isIOS = /\(iP(hone|od|ad);/i.test(ua);
+      const isAndroid = /\bAndroid\b/i.test(ua) && !/Windows/i.test(ua);
+      const scheme = `line://ti/p/637zzurf`;
+      if (isIOS || isAndroid) {
         e.preventDefault();
-        location.href='line://ti/p/637zzurf';
-        setTimeout(()=>location.href=addUrl, 800);
+        location.href = scheme;
+        setTimeout(() => location.href = addUrl, 800);
       }
     });
 
-    btnWrap.append(lineBtn);
+    btnWrap.append(lineA);
     box.insertBefore(btnWrap, box.children[1]);
-    box.scrollIntoView({behavior:'smooth'});
+    box.scrollIntoView({ behavior: 'smooth' });
   }
 });
