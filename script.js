@@ -154,18 +154,28 @@ const btnWrap = document.createElement("div");
 btnWrap.style.cssText = "text-align:center; margin-bottom:20px;";
 
 // ✅ 下載按鈕：淺藍底、黑字
-const dlBtn = document.createElement("button");
-dlBtn.textContent = "下載健檢成果";
-dlBtn.type = "button";
+// 建立下載按鈕（改用 <a>）
+const dlBtn = document.createElement('a');
+dlBtn.textContent = '下載健檢成果';
 dlBtn.style.cssText = `
+  display:inline-block;
   padding:8px 16px;
   font-size:15px;
   background:#e0f0ff;
   color:#000;
   border:1px solid #66aadd;
   border-radius:6px;
-  cursor:pointer;
+  text-decoration:none;
 `;
+
+// …等 html2canvas 把圖片做出來之後：
+const canvas = await html2canvas(box, { scale: 2 });
+const blob   = await new Promise(r => canvas.toBlob(r, 'image/png'));
+const imgURL = URL.createObjectURL(blob);
+
+// 👇 只要這兩行就行了
+dlBtn.href     = imgURL;                  // 指向圖片
+dlBtn.download = '健檢問卷結果.png';      // 有支援的瀏覽器會直接下載
 
 // ✅ LINE 諮詢按鈕
 const lineBtn = document.createElement("button");
