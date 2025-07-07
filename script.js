@@ -154,7 +154,7 @@ const btnWrap = document.createElement("div");
 btnWrap.style.cssText = "text-align:center; margin-bottom:20px;";
 
 // ✅ 下載按鈕：淺藍底、黑字
-// 建立下載按鈕（改用 <a>）
+// ===== 1. 先建立 <a>，只有外觀 =====
 const dlBtn = document.createElement('a');
 dlBtn.textContent = '下載健檢成果';
 dlBtn.style.cssText = `
@@ -168,11 +168,17 @@ dlBtn.style.cssText = `
   text-decoration:none;
 `;
 
-// …等 html2canvas 把圖片做出來之後：
-const canvas = await html2canvas(box, { scale: 2 });
-const blob   = await new Promise(r => canvas.toBlob(r, 'image/png'));
-const imgURL = URL.createObjectURL(blob);
+// …中間先把 box、table 都塞好…
 
+// ===== 2. 做出圖片，再把屬性補進 dlBtn =====
+const canvas  = await html2canvas(box, { scale: 2 });
+const blob    = await new Promise(r => canvas.toBlob(r, 'image/png'));
+const imgURL  = URL.createObjectURL(blob);
+
+// 把「連結」真正指到圖片
+dlBtn.href     = imgURL;                     // 所有環境都用得到
+dlBtn.download = '健檢問卷結果.png';         // 桌機 / Android-Chrome 會直接下載
+dlBtn.target   = '_blank';                   // iOS Safari、LINE 會開新分頁
 // 👇 只要這兩行就行了
 dlBtn.href     = imgURL;                  // 指向圖片
 dlBtn.download = '健檢問卷結果.png';      // 有支援的瀏覽器會直接下載
@@ -269,19 +275,21 @@ function openLine () {
   const noAt   = lineID.slice(1);
   const ua     = navigator.userAgent;
 
-  const isiOS      = /iPad|iPhone|iPod/.test(ua);        // iPhone／iPad
-  // 要同時帶有 Android 和 Mobile 才算手機，排除桌機 Chrome 的「模擬」UA
-  const isAndroid  = /Android/i.test(ua) && /Mobile/i.test(ua);
+  const isiOS     = /iPad|iPhone|iPod/.test(ua);           // iOS 裝置
+  const isAndroid = /Android/i.test(ua) &&                 // 必須含 Android
+                    /Mobile/i.test(ua)  &&                 // 必須含 Mobile
+                    !/Windows|Macintosh|X11/i.test(ua);    // 不能是桌機 UA
 
-  if (isiOS) {                         // iOS 直接用 scheme
+  if (isiOS) {                                            // iOS → scheme
     location.href = `line://ti/p/${noAt}`;
     return;
   }
-  if (isAndroid) {                     // Android 才送 intent://
-    location.href = `intent://ti/p/${noAt}#Intent;scheme=line;package=jp.naver.line.android;end`;
+  if (isAndroid) {                                        // Android → intent
+    location.href =
+      `intent://ti/p/${noAt}#Intent;scheme=line;package=jp.naver.line.android;end`;
     return;
   }
-  // 走到這裡就是桌面瀏覽器，改用官方 https 加好友頁
+  // 其餘（桌機瀏覽器）→ 官方 https 加好友頁
   location.href = `https://line.me/R/ti/p/%40${noAt}`;
 }
 }); /* -------- DOMContentLoaded END -------- */
