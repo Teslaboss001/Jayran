@@ -117,10 +117,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const box=document.createElement('div'); box.className='result-container';
     box.innerHTML=`
       <p style="background:#fffae6;border:1px solid #f2c94c;
-                padding:10px;text-align:center;font-weight:600;
-                margin-bottom:15px;">
-        請先下載健檢資料，再前往 LINE 諮詢
-      </p>`;
+          padding:10px;text-align:center;font-weight:600;
+          margin-bottom:15px;">
+  📸 請自行截圖此評估結果，並傳送至 LINE 諮詢
+</p>
     const info = {
       name:$('name').value, phone:$('phone').value,
       line:$('lineId').value, bday:$('birthday').value,
@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    btnWrap.append(dl,lineA);
+    btnWrap.append(lineA);
     box.insertBefore(btnWrap, box.children[1]); // 放在提示之後
     box.scrollIntoView({behavior:'smooth'});
   }
