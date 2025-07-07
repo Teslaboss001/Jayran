@@ -43,25 +43,19 @@
 </head>
 <body>
   <div class="overlay">
-    <!-- 基本資料 -->
     <div id="basicInfoSection">
       <h2>冠智關心您－健檢問卷</h2>
       <label>姓名：</label>
-      <input id="name" type="text" placeholder="例如 王小明" required />
-
+      <input id="name" type="text" required />
       <label>聯絡電話：</label>
-      <input id="phone" type="tel" placeholder="例如 0912345678" required />
-
+      <input id="phone" type="tel" required />
       <label>Line ID：</label>
-      <input id="lineId" type="text" placeholder="例如 myline123" required />
-
+      <input id="lineId" type="text" required />
       <label>生日：</label>
       <input id="birthday" type="date" required />
-
       <button id="nextBtn" type="button">下一步</button>
     </div>
 
-    <!-- 問卷部分 -->
     <div id="questionSection" style="display:none">
       <div id="jobSection">
         <label>請選擇您的職業類別：</label>
@@ -84,39 +78,47 @@
       const spinQuestions = {
         "一般上班族": [
           { q: "你現在做的這份工作穩定嗎？", options: ["穩定", "偶爾變動", "很不穩定"] },
-          { q: "這份工作對你來說壓力大不大？", options: ["正常", "壓力大", "非常疲憊"] },
-          { q: "你目前有固定在儲蓄嗎？還是存了就花？", options: ["有固定存","幾乎沒存"] },
-          { q: "公司有提撥勞退，你還有另外規劃退休金嗎？", options: ["有額外規劃", "想規劃但還沒做", "沒有規劃"] },
-          { q: "若突發大筆支出（家人生病醫療費等），你覺得夠用嗎？", options: ["可能夠", "完全沒有準備"] },
-          { q: "退休後勞退每月2萬的生活費你覺得夠嗎？", options: ["應該夠用","還想更多"] },
-          { q: "若裁員或生病無法上班幾個月，生活開銷有個備案嗎？", options: ["有一筆緊急避難金", "有想過但還沒準備"] },
-          { q: "如果有個方式，可以每月幫你存一點，未來變成一筆退休補貼，或遇急用也能用，你覺得重要嗎？", options: ["重要", "還好"] },
-          { q: "這種方式就像幫自己準備一個『備用電池』，平常不用，但哪天斷電就知道多重要了，你想進一步了解嗎？", options: ["想了解", "觀望"] }
+          { q: "這份工作對你來說壓力大不大？", options: ["正常", "壓力大", "非常疲憊"] }
+        ],
+        "自營業者": [
+          { q: "你目前生意穩定嗎？", options: ["穩定", "偶爾波動"] },
+          { q: "你固定存錢？還是全部投入事業？", options: ["固定存錢", "全部投入"] }
+        ],
+        "領導主管": [
+          { q: "你目前團隊工作量是否滿檔？", options: ["非常忙碌", "偶爾加班", "時間彈性"] },
+          { q: "你現在有固定安排資產儲蓄嗎？", options: ["有", "部分", "沒有"] }
+        ],
+        "計程車司機": [
+          { q: "您一天大約開幾小時？", options: ["12小時以上", "8到12小時", "少於8小時"] },
+          { q: "開車收入是否波動？", options: ["很穩定", "稍有波動"] }
+        ],
+        "公職/醫療": [
+          { q: "你目前在單位服務習慣嗎？", options: ["還行", "不太習慣"] },
+          { q: "你有另外儲蓄或投資嗎？", options: ["有", "沒有"] }
         ]
-        // 其他職業請照樣補進來
       };
 
       const $ = id => document.getElementById(id);
-      const show = (id, f) => { $(id).style.display = f ? 'block' : 'none'; };
-
-      const form = $('questionForm');
-      const jobSel = $('job');
+      const show = (id, visible) => { $(id).style.display = visible ? 'block' : 'none'; };
 
       $('nextBtn').addEventListener('click', () => {
-        if (!($('name').value.trim() && $('phone').value.trim() &&
-              $('lineId').value.trim() && $('birthday').value)) {
-          alert('請完整填寫所有基本資料！');
+        if (!($('name').value && $('phone').value && $('lineId').value && $('birthday').value)) {
+          alert("請完整填寫所有基本資料！");
           return;
         }
         show('basicInfoSection', false);
         show('questionSection', true);
       });
 
-      jobSel.addEventListener('change', () => jobSel.value && buildQuestions());
+      $('job').addEventListener('change', () => {
+        if ($('job').value) buildQuestions();
+      });
 
-      function buildQuestions () {
-        const qs = spinQuestions[jobSel.value] || [];
+      function buildQuestions() {
+        const qs = spinQuestions[$('job').value] || [];
+        const form = $('questionForm');
         form.innerHTML = '';
+
         qs.forEach((item, i) => {
           form.insertAdjacentHTML('beforeend', `<label>Q${i+1}. ${item.q}</label>`);
           item.options.forEach(opt => {
@@ -126,26 +128,29 @@
         });
 
         const btn = document.createElement('button');
-        btn.textContent = '開始評估';
         btn.type = 'button';
-        btn.style.marginTop = '25px';
+        btn.textContent = '開始評估';
+        btn.style.marginTop = '20px';
         btn.onclick = () => showResult(qs);
         form.appendChild(btn);
         form.scrollIntoView({ behavior: 'smooth' });
       }
 
       async function showResult(qs) {
+        const form = $('questionForm');
         const ans = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
         const miss = ans.findIndex(a => !a);
-        if (miss !== -1) return alert(`請回答第 ${miss + 1} 題！`);
+        if (miss !== -1) return alert(`請回答第 ${miss+1} 題！`);
 
         $('jobSection').style.display = 'none';
         form.innerHTML = '';
+
         const box = document.createElement('div');
         box.className = 'result-container';
         box.style.maxWidth = '340px';
         box.style.margin = '0 auto';
 
+        // 黃色提示
         box.innerHTML = `
           <p style="background:#fffae6;border:1px solid #f2c94c;
                     padding:10px;text-align:center;font-weight:600;
@@ -158,7 +163,7 @@
           phone: $('phone').value,
           line: $('lineId').value,
           bday: $('birthday').value,
-          job: jobSel.value
+          job: $('job').value
         };
 
         box.insertAdjacentHTML('beforeend', `
@@ -206,7 +211,7 @@
           }
         });
 
-        btnWrap.append(lineA);
+        btnWrap.appendChild(lineA);
         box.insertBefore(btnWrap, box.children[1]);
         box.scrollIntoView({ behavior: 'smooth' });
       }
