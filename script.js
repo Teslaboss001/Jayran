@@ -65,8 +65,9 @@ document.addEventListener("DOMContentLoaded", () => {
     { q: "這就像替自己加裝一層額外防護網，平常用不到，但關鍵時刻保護你和家人，你會想深入了解嗎？", options: ["想了解", "再看看"] }
   ]
 };
-     /* === 2. DOM 快捷 === */
-  const $    = id => document.getElementById(id);
+   
+ /* === 2. DOM 快捷 === */
+  const $    = id  => document.getElementById(id);
   const show = (id, flag) => { $(id).style.display = flag ? 'block' : 'none'; };
 
   const form   = $('questionForm');
@@ -122,157 +123,124 @@ document.addEventListener("DOMContentLoaded", () => {
     form.scrollIntoView({ behavior: 'smooth' });
   }
 
-/* === 5. 顯示結果（含提示、下載、LINE 
-async function showResult(qs) {
-  // ...驗證略
+  /* === 5. 顯示結果（含下載、LINE 按鈕） === */
+  async function showResult (qs) {
+    /* ---------- 先收答案 ---------- */
+    const ans  = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
+    const miss = ans.findIndex(a => !a);
+    if (miss !== -1) return alert(`請回答第 ${miss + 1} 題！`);
 
-  const info = {
-    name: $("name").value,
-    phone: $("phone").value,
-    line: $("lineId").value,
-    bday: $("birthday").value,
-    job: jobSel.value
-  };
+    /* ---------- 組結果版面 ---------- */
+    form.innerHTML = '';
+    const box = document.createElement('div');
+    box.className = 'result-container';
 
-  form.innerHTML = "";
-  const box = document.createElement("div");
-  box.className = "result-container";
+    const notice = document.createElement('p');
+    notice.textContent = '請先下載健檢資料，再前往 LINE 諮詢';
+    notice.style.cssText =
+      'background:#fffae6;border:1px solid #f2c94c;padding:10px;text-align:center;font-weight:600;margin-bottom:15px;';
+    box.appendChild(notice);
 
-  // 提示文字
-  const notice = document.createElement("p");
-  notice.textContent = "請先下載健檢資料，再前往 LINE 諮詢";
-  notice.style.cssText = "background:#fffae6;border:1px solid #f2c94c;padding:10px;text-align:center;font-weight:600;margin-bottom:15px;";
-  box.appendChild(notice);
-
-  // 基本資料表格
-  const table = document.createElement("table");
-  table.style.cssText = "width:100%;border:1px solid #ddd;font-size:15px";
-  table.innerHTML = `
-    <tr><th style="width:35%">姓名</th><td>${info.name}</td></tr>
-    <tr><th>電話</th><td>${info.phone}</td></tr>
-    <tr><th>Line ID</th><td>${info.line}</td></tr>
-    <tr><th>生日</th><td>${info.bday}</td></tr>
-    <tr><th>職業</th><td>${info.job}</td></tr>
-  `;
-  box.appendChild(table);
-
-  // 問答卡片
-  const ans = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
-  qs.forEach((item, i) => {
-    const qaCard = document.createElement("div");
-    qaCard.className = "qa-card";
-    qaCard.innerHTML = `
-      <div class="question">Q${i + 1}. ${item.q}</div>
-      <div class="answer">👉 ${ans[i].value}</div>
+    /* --- 基本資料表格 --- */
+    const info = {
+      name: $('name').value,
+      phone:$('phone').value,
+      line: $('lineId').value,
+      bday: $('birthday').value,
+      job : jobSel.value
+    };
+    const table = document.createElement('table');
+    table.style.cssText = 'width:100%;border:1px solid #ddd;font-size:15px';
+    table.innerHTML = `
+      <tr><th style="width:35%">姓名</th><td>${info.name}</td></tr>
+      <tr><th>電話</th><td>${info.phone}</td></tr>
+      <tr><th>Line ID</th><td>${info.line}</td></tr>
+      <tr><th>生日</th><td>${info.bday}</td></tr>
+      <tr><th>職業</th><td>${info.job}</td></tr>
     `;
-    box.appendChild(qaCard);
-  });
+    box.appendChild(table);
 
-  form.appendChild(box);
+    /* --- 問答卡片 --- */
+    qs.forEach((item, i) => {
+      const card = document.createElement('div');
+      card.className = 'qa-card';
+      card.innerHTML = `
+        <div class="question">Q${i + 1}. ${item.q}</div>
+        <div class="answer">👉 ${ans[i].value}</div>
+      `;
+      box.appendChild(card);
+    });
 
-  // 圖片轉圖
-  const canvas = await html2canvas(box, { scale: 2 });
-  const dataURL = canvas.toDataURL("image/png");
+    form.appendChild(box);            // 先插入，html2canvas 才抓得到
 
-  // 按鈕區
-  const btnWrap = document.createElement("div");
-  btnWrap.style.cssText = "text-align:center;margin:20px 0;";
+    /* ---------- 生成圖片 ---------- */
+    const canvas  = await html2canvas(box, { scale: 2 });
+    const dataURL = canvas.toDataURL('image/png');
 
-  const dlBtn = document.createElement("a");
-  dlBtn.textContent = "下載健檢成果";
-  dlBtn.href = dataURL;
-  dlBtn.download = "健檢問卷結果.png";
-  dlBtn.target = "_blank";
-  dlBtn.style.cssText = `
-    display:inline-block;
-    padding:8px 16px;
-    font-size:15px;
-    background:#e0f0ff;
-    color:#000;
-    border:1px solid #66aadd;
-    border-radius:6px;
-    text-decoration:none;
-  `;
+    /* ---------- 下載 & LINE 按鈕 ---------- */
+    const btnWrap = document.createElement('div');
+    btnWrap.style.cssText = 'text-align:center;margin:20px 0;';
 
-  const lineBtn = document.createElement("button");
-  lineBtn.textContent = "LINE 諮詢";
-  lineBtn.type = "button";
-  lineBtn.onclick = openLine;
-  lineBtn.style.cssText = `
-    padding:8px 16px;
-    font-size:15px;
-    background:#06c755;
-    color:#fff;
-    border:none;
-    border-radius:6px;
-    margin-left:10px;
-    cursor:pointer;
-  `;
+    // 下載
+    const dlBtn = document.createElement('a');
+    dlBtn.textContent = '下載健檢成果';
+    dlBtn.href     = dataURL;
+    dlBtn.download = '健檢問卷結果.png';   // 支援 a.download 會直接下載
+    dlBtn.target   = '_blank';              // iOS / LINE 會改成新分頁
+    dlBtn.style.cssText = `
+      display:inline-block;padding:8px 16px;font-size:15px;
+      background:#e0f0ff;color:#000;border:1px solid #66aadd;
+      border-radius:6px;text-decoration:none;
+    `;
 
-  btnWrap.append(dlBtn, lineBtn);
-  box.insertBefore(btnWrap, box.firstChild.nextSibling);
+    // LINE
+    const lineBtn = document.createElement('button');
+    lineBtn.textContent = 'LINE 諮詢';
+    lineBtn.type  = 'button';
+    lineBtn.onclick = openLine;
+    lineBtn.style.cssText = `
+      padding:8px 16px;font-size:15px;background:#06c755;color:#fff;
+      border:none;border-radius:6px;margin-left:10px;cursor:pointer;
+    `;
 
-  box.scrollIntoView({ behavior: "smooth" });
-}
-// 綁定點擊功能
-lineBtn.onclick = () => openLine();
+    btnWrap.append(dlBtn, lineBtn);
+    box.insertBefore(btnWrap, notice.nextSibling);
 
-btnWrap.appendChild(dlBtn);
-btnWrap.appendChild(lineBtn);
-box.appendChild(btnWrap);
+    /* ---------- 捲動 ---------- */
+    box.scrollIntoView({ behavior:'smooth' });
+  }
 
-  /* === 6A. 下載 PNG === */
-function downloadPNG(url) {
-  const ua    = navigator.userAgent;
-  const isIOS = /iPad|iPhone|iPod/.test(ua);
-  const isLINE = /\bLine\//i.test(ua);
+  /* === 6A.（保留給桌機）手動下載 fallback === */
+  function downloadPNG(url){
+    const a = document.createElement('a');
+    a.href = url; a.download = '健檢問卷結果.png';
+    a.style.display='none'; document.body.appendChild(a);
+    a.click(); document.body.removeChild(a);
+  }
 
-  // 1️⃣ iOS Safari 或 LINE WebView：用新分頁 + 手動長按儲存
-  if (isIOS || isLINE) {
-    const win = window.open(url, '_blank');
-    if (!win) {
-      alert("瀏覽器阻擋了新視窗，請在 Safari／Chrome 開啟本頁再試一次！");
-    } else {
-      alert("請長按開啟的圖片，選擇『加入相片』或『下載』");
+  /* === 6B. 開啟 LINE 加好友 === */
+  function openLine () {
+    const noAt = '637zzurf';                // 去掉 @
+    const ua   = navigator.userAgent||'';
+    const isIOS     = /\(iP(hone|od|ad);/i.test(ua);
+    const isAndroid = /\bAndroid\b/i.test(ua) && !/\bWindows\b/i.test(ua);
+
+    const iosScheme    = `line://ti/p/${noAt}`;
+    const androidInt   = `intent://ti/p/${noAt}#Intent;scheme=line;package=jp.naver.line.android;end`;
+    const fallbackHttp = `https://line.me/R/ti/p/%40${noAt}`;
+
+    if (isIOS){
+      location.href = iosScheme;
+      setTimeout(()=>location.href=fallbackHttp,800);
+      return;
     }
-    return;
+    if (isAndroid){
+      location.href = androidInt;
+      setTimeout(()=>location.href=fallbackHttp,800);
+      return;
+    }
+    window.open(fallbackHttp,'_blank');     // 桌機
   }
-
-  // 2️⃣ 其他瀏覽器：正常 a.download 觸發
-  const a = document.createElement('a');
-  a.href      = url;
-  a.download  = '健檢問卷結果.png';
-  a.style.display = 'none';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
-
-/* === 6B. 開啟 LINE 加好友 === */
-function openLine () {
-  const noAt = '637zzurf';                       // 去掉 @
-  const ua   = navigator.userAgent || '';
-
-  // ★ 判斷環境（不要再用 /Mobile/，桌機 Edge 會帶） ★
-  const isIOS      = /\(iP(hone|od|ad);/i.test(ua);
-  const isAndroid  = /\bAndroid\b/i.test(ua) && !/\bWindows\b/i.test(ua);
-
-  const iosScheme    = `line://ti/p/${noAt}`;
-  const androidInt   = `intent://ti/p/${noAt}#Intent;scheme=line;package=jp.naver.line.android;end`;
-  const fallbackHttp = `https://line.me/R/ti/p/%40${noAt}`;
-
-  // ★ 先嘗試叫醒 LINE，0.8 秒後自動回到 https（失敗就看得到）★
-  if (isIOS) {
-    location.href = iosScheme;
-    setTimeout(() => location.href = fallbackHttp, 800);
-    return;
-  }
-  if (isAndroid) {
-    location.href = androidInt;
-    setTimeout(() => location.href = fallbackHttp, 800);
-    return;
-  }
-  // 桌機直接開官方頁
-  window.open(fallbackHttp, '_blank');
-}
+});
+</script>
 }); /* -------- DOMContentLoaded END -------- */
