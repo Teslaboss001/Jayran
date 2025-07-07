@@ -272,25 +272,29 @@ function downloadPNG(url) {
 
 /* === 6B. 開啟 LINE 加好友 === */
 function openLine () {
-  const lineID = '@637zzurf';
-  const noAt   = lineID.slice(1);
-  const ua     = navigator.userAgent;
+  const noAt = '637zzurf';                       // 去掉 @
+  const ua   = navigator.userAgent || '';
 
-  const isiOS     = /iPad|iPhone|iPod/.test(ua);           // iOS 裝置
-  const isAndroid = /Android/i.test(ua) &&                 // 必須含 Android
-                    /Mobile/i.test(ua)  &&                 // 必須含 Mobile
-                    !/Windows|Macintosh|X11/i.test(ua);    // 不能是桌機 UA
+  // ★ 判斷環境（不要再用 /Mobile/，桌機 Edge 會帶） ★
+  const isIOS      = /\(iP(hone|od|ad);/i.test(ua);
+  const isAndroid  = /\bAndroid\b/i.test(ua) && !/\bWindows\b/i.test(ua);
 
-  if (isiOS) {                                            // iOS → scheme
-    location.href = `line://ti/p/${noAt}`;
+  const iosScheme    = `line://ti/p/${noAt}`;
+  const androidInt   = `intent://ti/p/${noAt}#Intent;scheme=line;package=jp.naver.line.android;end`;
+  const fallbackHttp = `https://line.me/R/ti/p/%40${noAt}`;
+
+  // ★ 先嘗試叫醒 LINE，0.8 秒後自動回到 https（失敗就看得到）★
+  if (isIOS) {
+    location.href = iosScheme;
+    setTimeout(() => location.href = fallbackHttp, 800);
     return;
   }
-  if (isAndroid) {                                        // Android → intent
-    location.href =
-      `intent://ti/p/${noAt}#Intent;scheme=line;package=jp.naver.line.android;end`;
+  if (isAndroid) {
+    location.href = androidInt;
+    setTimeout(() => location.href = fallbackHttp, 800);
     return;
   }
-  // 其餘（桌機瀏覽器）→ 官方 https 加好友頁
-  location.href = `https://line.me/R/ti/p/%40${noAt}`;
+  // 桌機直接開官方頁
+  window.open(fallbackHttp, '_blank');
 }
 }); /* -------- DOMContentLoaded END -------- */
