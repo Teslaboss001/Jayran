@@ -39,16 +39,17 @@
     <!-- === ② 職業選擇 + 問卷（先隱藏） === -->
     <div id="questionSection" style="display:none">
       <div class="center-wrapper">
-        <label for="job">請選擇您的職業類別：</label>
-        <select id="job">
-          <option value="">請選擇</option>
-          <option value="一般上班族">一般上班族</option>
-          <option value="自營業者">自營業者</option>
-          <option value="領導主管">領導主管</option>
-          <option value="計程車司機">計程車司機</option>
-          <option value="公職/醫療">公職 / 醫療</option>
-        </select>
-      </div>
+        <!-- ✅ 改成這一段，加入包裹 div，並加上 id="jobSection" 才能讓 JS 正常隱藏它 -->
+<div id="jobSection">
+  <label for="job">請選擇您的職業類別：</label>
+  <select id="job">
+    <option value="">請選擇</option>
+    <option value="自營業者">自營業者</option>
+    <option value="領導主管">領導主管</option>
+    <option value="一般上班族">一般上班族</option>
+    <!-- 其他選項可繼續補上 -->
+  </select>
+</div>
 
       <!-- 問卷題目會動態插入這裡 -->
       <form id="questionForm"></form>
