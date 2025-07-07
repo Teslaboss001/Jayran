@@ -67,23 +67,17 @@ document.addEventListener("DOMContentLoaded", () => {
 };
   
 /* ==========  冠智問卷  ========== */
-<!-- html2canvas：仍保留，讓結果畫面先渲染成圖，截圖會更清晰 -->
 <script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+  const spinQuestions = { /* ← 這裡貼入完整題庫 */ };
 
-  /* ===== 1. 題庫 ===== */
-  const spinQuestions = { /* ... 你的題庫照貼 ... */ };
-
-  /* ===== 2. DOM 快捷 ===== */
   const $    = id => document.getElementById(id);
   const show = (id, f) => { $(id).style.display = f ? 'block' : 'none'; };
 
   const form   = $('questionForm');
   const jobSel = $('job');
 
-  /* ===== 3. 基本資料 → 下一步 ===== */
   $('nextBtn').addEventListener('click', () => {
     if (!($('name').value.trim() && $('phone').value.trim() &&
           $('lineId').value.trim() && $('birthday').value)) {
@@ -93,12 +87,14 @@ document.addEventListener('DOMContentLoaded', () => {
     show('questionSection',  true);
   });
 
-  /* ===== 4. 選職業 → 產生問卷 ===== */
   jobSel.addEventListener('change', () => jobSel.value && buildQuestions());
 
   function buildQuestions () {
     const qs = spinQuestions[jobSel.value] || [];
     form.innerHTML = '';
+
+    // 隱藏職業選單（✅重點1）
+    $('jobSection').style.display = 'none';
 
     qs.forEach((item, i) => {
       form.insertAdjacentHTML('beforeend', `<label>Q${i+1}. ${item.q}</label>`);
@@ -120,29 +116,23 @@ document.addEventListener('DOMContentLoaded', () => {
     form.scrollIntoView({ behavior:'smooth' });
   }
 
-  /* ===== 5. 顯示結果（只剩 LINE 按鈕） ===== */
   async function showResult (qs) {
-
-    /* 5-1 先檢查是否答完 */
     const ans  = qs.map((_, i) => form.querySelector(`input[name="q${i}"]:checked`));
     const miss = ans.findIndex(a => !a);
     if (miss !== -1) return alert(`請回答第 ${miss+1} 題！`);
 
-    /* 5-2 建立結果容器 */
     form.innerHTML = '';
-
     const box = document.createElement('div');
     box.className = 'result-container';
-    /* 置中 + 限寬 + 小字體 */
     box.style.cssText =
       'max-width:320px;margin:0 auto;font-size:14px;line-height:1.4;text-align:left;';
 
+    // ✅重點2：更改黃色提示文字
     box.innerHTML = `
       <p style="background:#fffae6;border:1px solid #f2c94c;padding:10px;font-weight:600;text-align:center;">
-        請截圖健檢結果，<br>再點按下方按鈕前往 LINE 諮詢
+        請自行截圖此評估結果，<br>傳送至 LINE 評估
       </p>`;
 
-    /* 基本資料 */
     const info = {
       name: $('name').value,
       phone:$('phone').value,
@@ -160,7 +150,6 @@ document.addEventListener('DOMContentLoaded', () => {
         <tr><th style="border:1px solid #ddd;padding:4px">職業</th><td style="border:1px solid #ddd;padding:4px">${info.job}</td></tr>
       </table>`);
 
-    /* 問答卡片 */
     qs.forEach((item, i) => {
       box.insertAdjacentHTML('beforeend', `
         <div style="margin:6px 0;padding:4px 0;border-bottom:1px dashed #ccc;">
@@ -171,10 +160,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     form.appendChild(box);
 
-    /* 5-3 轉成圖片（讓截圖更銳利）── 不顯示、不下載 */
-    await html2canvas(box, { scale:2 });
+    await html2canvas(box, { scale: 2 });  // 渲染出清晰截圖畫面，不會產生按鈕
 
-    /* 5-4 只留 LINE 按鈕 */
+    // ✅重點3：不產生「下載」按鈕，僅留 LINE 諮詢
     const btnWrap = document.createElement('div');
     btnWrap.style.cssText = 'text-align:center;margin:20px 0;';
 
@@ -188,7 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
       'background:#06c755;color:#fff;border-radius:6px;' +
       'text-decoration:none;font-weight:600;';
 
-    /* 手機再試 URI-scheme */
     lineA.addEventListener('click', e => {
       const ua        = navigator.userAgent;
       const isIOS     = /\(iP(hone|od|ad);/i.test(ua);
@@ -202,9 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnWrap.appendChild(lineA);
     box.appendChild(btnWrap);
-
     box.scrollIntoView({ behavior:'smooth' });
   }
-
 });
 </script>
