@@ -1,7 +1,7 @@
 // ★ script.js 檔案，這裡是正確版本開頭
 document.addEventListener('DOMContentLoaded', () => {
   const spinQuestions = {
-    "一般上班族": [
+    "服務業": [
     { q: "你現在做的這份工作穩定嗎？", options: ["穩定", "偶爾變動", "很不穩定"] },
     { q: "這份工作對你來說壓力大不大？", options: ["正常", "壓力大", "非常疲憊"] },
     { q: "你目前有固定在儲蓄嗎？還是存了就花？", options: ["有固定存","幾乎沒存"] },
